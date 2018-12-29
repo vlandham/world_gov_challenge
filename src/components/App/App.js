@@ -19,7 +19,7 @@ class App extends Component {
             <Col sm={9}>
               <div className="line" />
               <p>
-                What makes a good government? Some would say this is a dumb
+                What makes a good government? Some would say this is a good
                 question.
               </p>
             </Col>

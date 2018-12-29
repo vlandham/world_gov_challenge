@@ -1,0 +1,687 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+## Small Countries Data
+
+```{r}
+filename <- "data/WDVP Datasets - small countries are beautiful.csv"
+sc_data <- read_csv(filename, na = '-')
+```
+
+Download government data to merge as well. 
+
+```{r}
+filename <- "data/WDVP_good_gov.csv"
+gov_data <- read_csv(filename, na = '-')
+```
+
+```{r}
+both_data <- merge(sc_data, gov_data, by= "country")
+```
+
+
+### Metrics
+
+
+```{r}
+sc_data$gdp_by_healthcare <- sc_data$GDP_1 / sc_data$`health expenditure`
+sc_data$gdp_by_education <- sc_data$GDP_1 / sc_data$`education expenditure`
+sc_data$hdi <- sc_data$`human development index`
+
+sc_data$gdp_by_hdi <- sc_data$GDP_1 / sc_data$`human development index`
+```
+
+### Display
+
+```{r}
+sc_data %>%
+  ggplot(aes(x = `human development index`)) +
+  geom_histogram(bins = 30) +
+  labs(title = "Distribution of ")
+```
+
+
+```{r, fig.height=6, fig.width=5}
+sc_data %>% filter(gdp_by_hdi > 0) %>%
+  ggplot(aes(x=fct_reorder(country, gdp_by_hdi), y=gdp_by_hdi)) +
+  geom_bar(stat="identity") +
+  coord_flip()
+```
+
+
+```{r}
+sc_data %>% 
+  ggplot(aes(x = GDP_1, y = `human development index`)) + 
+  geom_text(check_overlap = TRUE, aes(label = country)) +
+  geom_point() 
+  
+```
+
+```{r}
+sc_data %>% 
+  ggplot(aes(x = `world happiness report score`, y = `human development index`)) + 
+  geom_text(check_overlap = TRUE, aes(label = country)) +
+  geom_point() 
+```
+
+
+```{r}
+sc_data %>% filter(`human development index` > 0) %>%
+  ggplot(aes(x=fct_reorder(country, `human development index`), y=`human development index`)) +
+  geom_bar(stat="identity") +
+  coord_flip()
+```
+
+
+```{r}
+sc_data %>% filter(`world happiness report score` > 0) %>%
+  ggplot(aes(x=fct_reorder(country, `world happiness report score`), y=  `world happiness report score`)) +
+  geom_bar(stat="identity") +
+  coord_flip()
+```
+
+```{r}
+sc_data %>% 
+  ggplot(aes(x = `population density`, y = `happy planet index`)) + 
+  geom_text(check_overlap = TRUE, aes(label = country)) +
+  geom_point() 
+  
+```
+
+```{r}
+sc_data %>% filter(`% foreign-born population` > 50)
+```
+
+
+```{r}
+sc_data %>% 
+  ggplot(aes(x = `human development index`, y = GDP_1)) + 
+  geom_point() +
+  geom_text(check_overlap = TRUE, aes(label = country)) +
+  geom_smooth(method='lm')
+  
+```
+
+
+
+```{r}
+sc_data %>% 
+  ggplot(aes(x = `health expenditure`, y = GDP_1)) + 
+  geom_point() +
+  geom_text(check_overlap = TRUE, aes(label = country)) 
+  #geom_smooth(method='lm')
+  #geom_line()
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+sc_data %>% 
+  ggplot(aes(x = `world happiness report score`, y = `% foreign-born population`)) + 
+  geom_point() +
+  geom_text(check_overlap = TRUE, aes(label = country))
+  #geom_line()
+```
+
+```{r}
+sc_data %>% 
+  ggplot(aes(x = `health expenditure`, y = `education expenditure`)) + 
+  geom_point() + geom_text(check_overlap = TRUE, aes(label = country))
+  #geom_line()
+```
+
+```{r}
+sc_data %>% 
+  ggplot(aes(x = GDP_1, y = `human development index`)) + 
+  geom_point() + geom_text(check_overlap = TRUE, aes(label = country))
+  #geom_line()
+```
+
+```{r}
+linearMod <- lm(GDP_1 ~ gdp_by_hdi, data = sc_data )
+
+summary(linearMod)
+```
+
+
+## GOV Data
+
+Creation of dataset happened above.
+
+### Metrics
+
+```{r}
+# sc_data %>% summarise(max_pop = max(population))
+# max_pop is 4900000 so 4,900,000 or 5,000,000
+
+small_country_max_pop = 5000000
+```
+
+
+```{r}
+gov_data$country_size <- ifelse(gov_data$population > small_country_max_pop, 'big', 'little')
+```
+
+```{r}
+#gov_data %>% filter(country == "United States") %>% select(`GINI index`)
+```
+
+
+```{r}
+gov_data$gdp <- gov_data$`GDP per capita (PPP)`
+gov_data$hdi <- gov_data$`human development index`
+gov_data$density <- gov_data$population / gov_data$`surface area (Km2)`
+
+gov_data$seda <- gov_data$`sustainable economic development assessment (SEDA)`
+gov_data$gini <- gov_data$`GINI index`
+
+```
+
+
+### Review 
+
+```{r}
+gov_data %>% group_by(country_size) %>% summarise(mean_hdi = mean(hdi, na.rm = TRUE), n = n())
+```
+
+
+
+### Visualize
+
+```{r}
+gov_data %>%
+  ggplot(aes(x = country_size, y = hdi)) +
+  geom_boxplot()
+```
+
+
+```{r}
+gov_data %>%  filter(country_size == 'big') %>% 
+  ggplot(aes(x = population, y=hdi, color = country_size)) +
+  geom_point() +
+  scale_x_continuous(limits=c(0, 50000000)) + 
+  geom_text(check_overlap = TRUE, aes(label = country))
+```
+
+
+
+```{r}
+gov_data %>%
+  ggplot(aes(x = `world happiness report score`, y=`happy planet index`, color = country_size )) +
+  geom_point() +
+  geom_text(check_overlap = TRUE, aes(label = country)) +
+  geom_smooth(method='lm')
+```
+
+```{r}
+gov_data %>% arrange(-hdi)
+```
+
+
+```{r}
+gov_data %>% # filter(country_size == 'little') %>% 
+  ggplot(aes(x = `GINI index`, y=hdi, color = country_size, size = population)) +
+  geom_point() +
+  geom_text(check_overlap = TRUE, aes(label = country))
+```
+
+
+```{r}
+gov_data %>%
+  ggplot(aes(x = `GINI index`, y=gdp, color = country_size )) +
+  geom_point() +
+  scale_y_continuous(limits = c(0, 50000)) +
+  geom_text(check_overlap = TRUE, aes(label = country)) + 
+  geom_smooth(method='lm')
+```
+
+```{r}
+gov_data %>%
+  ggplot(aes(y = gdp, x=hdi, color = country_size )) +
+  geom_point() +
+  labs(title = "HDI vs GDP") +
+  geom_text(check_overlap = TRUE, aes(label = country)) +
+  geom_smooth(method='lm') 
+  
+```
+
+```{r}
+gov_data %>%
+  ggplot(aes(y = gini, x=hdi, color = country_size )) +
+  geom_point() +
+  labs(title = "HDI vs GINI") +
+  geom_text(check_overlap = TRUE, aes(label = country)) +
+  geom_smooth(method='lm') 
+  
+```
+
+```{r}
+gov_data %>%
+  ggplot(aes(x = `rule of law`)) + 
+  geom_histogram()
+```
+
+```{r}
+gov_data %>%
+  ggplot(aes(x = `GINI index`)) + 
+  geom_histogram()
+```
+
+## HDI
+
+Human Development Index (HDI)
+A composite index measuring average achievement in three basic dimensions of human development—
+* a long and healthy life, 
+* knowledge 
+* and a decent standard of living. 
+
+```{r}
+filename <- "data/Human Development Index.csv"
+hdi_data <- read_csv(filename)
+# drop X# columns. dangerous, but easy. 
+hdi_data <- hdi_data %>% select(-contains('X'))
+```
+
+Make long data out of all the years
+```{r}
+hdi_data_long <- hdi_data %>% gather(key = "year", value = "hdi_value", -one_of("Country", "HDI Rank (2017)"))
+```
+
+
+Add country from 'Country'
+```{r}
+hdi_data_long$country <- hdi_data_long$Country
+hdi_data_long$year_n <- as.numeric(hdi_data_long$year)
+```
+
+
+
+## Economic Freedom
+
+https://www.heritage.org/index/about
+
+Economic freedom is the fundamental right of every human to control his or her own labor and property. In an economically free society, individuals are free to work, produce, consume, and invest in any way they please. In economically free societies, governments allow labor, capital, and goods to move freely, and refrain from coercion or constraint of liberty beyond the extent necessary to protect and maintain liberty itself.
+
+Economic freedom brings greater prosperity. The Index of Economic Freedom documents the positive relationship between economic freedom and a variety of positive social and economic goals. The ideals of economic freedom are strongly associated with healthier societies, cleaner environments, greater per capita wealth, human development, democracy, and poverty elimination.
+
+```{r}
+filename <- "data/heritage_economic_freedom_score.csv"
+ecfree_data <- read_csv(filename, na = "N/A")
+```
+
+```{r}
+ecfree_hdi_data <- left_join(ecfree_data, hdi_data_long, by = c("name" = "country", "index year" = "year_n"))
+```
+
+```{r}
+summary(ecfree_hdi_data)
+```
+
+
+```{r}
+ecfree_hdi_data %>% filter(`overall score` < 25)
+```
+
+
+```{r}
+ecfree_hdi_data %>% filter(`index year` == 2017) %>%
+  ggplot(aes(x = hdi_value, y = `overall score`)) + 
+  geom_text(check_overlap = TRUE, aes(label = name)) + 
+  geom_point()
+```
+
+
+```{r}
+ecfree_hdi_data %>% filter(name == 'Ethiopia' ) %>% arrange(`index year`)
+```
+
+
+
+```{r}
+ecfree_hdi_data %>% filter(name == 'South Korea' ) %>% arrange(`index year`) %>%
+  ggplot(aes( x = `overall score`, y = hdi_value)) + 
+  geom_text(check_overlap = TRUE, aes(label = `index year`)) + 
+  labs(x = 'Economic Freedom', y = 'HDI') +
+  geom_point() + 
+  geom_path()
+```
+
+## World Bank Data
+
+An international dollar has the same purchasing power over GNI as a U.S. dollar has in the United States. 
+
+Gross National Income per Capita
+
+GNI is the sum of value added by all resident producers plus any product taxes (less subsidies) not included in the valuation of output plus net receipts of primary income (compensation of employees and property income) from abroad.
+
+https://howwegettonext.com/gdp-sucks-here-are-some-better-alternatives-88cf2bfec017
+
+GNI measures the economic output of its citizens — taking into account the globalization of modern business. It’s calculated by adding up all the income of the residents of a country, including that received from abroad. As such, it helps show the economic strength of a country’s population, rather than the country itself. Measuring per capita allows the effects of fluctuating populations to be negated. Higher numbers mean a country’s citizens earn more.
+
+Human Development Index
+
+Alongside financial measures, the Human Development Index combines statistics on life expectancy, education, and income per capita to rank countries into tiers of development. Often framed in terms of whether people are able to “be” and “do” desirable things in life, HDI was developed by Pakistani economist Mahbub ul Haq and is backed by the United Nations. The higher the number, the more “developed” the country.
+
+Happy Planet Index
+
+It uses global data on life expectancy, experienced well-being, and ecological footprint to calculate an index that ranks countries on how many long and happy lives they produce per unit of environmental input. The higher the number, the happier the population.
+
+Gini Coefficient
+
+One of the biggest issues with GDP is that it ignores inequality. The Gini coefficient, invented in 1912 by Italian statistician Corrado Gini, represents the income distribution of a nation’s residents. A low number represents low inequality, while a high one indicates a major gap between the rich and poor.
+
+Gini index measures the degree of inequality in the distribution of family income in a country. The more nearly equal a country's income distribution, the lower its Gini index, e.g., a Scandinavian country with an index of 25. The more unequal a country's income distribution, the higher its Gini index, e.g., a Sub-Saharan country with an index of 50. If income were distributed with perfect equality the index would be zero; if income were distributed with perfect inequality, the index would be 100.
+
+```{r}
+library(wbstats)
+```
+
+```{r}
+wb_vars <- wbsearch(pattern = "GNI")
+wb_vars
+```
+
+```{r}
+# 
+# NY.GDP.PCAP.PP.CD = GDP per capita, PPP (current international $)
+# NY.GDP.MKTP.KD.ZG = GDP growth (annual %)
+# NY.GDP.PCAP.KD.ZG = GDP per capita growth (annual %) 
+# NY.GNP.PCAP.PP.CD = GNI per capita, PPP (current international $)
+# NY.GNP.PCAP.KD.ZG = GNI per capita growth (annual %)
+
+
+# SH.XPD.CHEX.GD.ZS = Current health expenditure (% of GDP)
+# EG.FEC.RNEW.ZS = renewable energy consumption as % of total final energy consumption
+
+# SI.POV.GINI = GINI index (World Bank estimate)
+
+# SP.POP.TOTL = population total
+# SP.URB.TOTL.IN.ZS = Urban population (% of total)
+# EG.USE.COMM.CL.ZS = Alternative and nuclear energy (% of total energy use)
+#
+#
+#indicators <- c('NY.GDP.PCAP.PP.CD', 'SH.XPD.TOTL.ZS', 'NY.GNP.PCAP.KD.ZG',  'SI.POV.GINI')
+indicators <- c('NY.GDP.PCAP.PP.CD', 'NY.GNP.PCAP.PP.CD', 'NY.GNP.PCAP.KD.ZG', 'SI.POV.GINI', 'SP.POP.TOTL')
+
+wb_data <- wb(country= "all", indicator = indicators, startdate = 2000, enddate = 2018, return_wide = TRUE)
+
+```
+
+```{r}
+wb_data$year = as.numeric(wb_data$date)
+```
+
+
+### Combo
+
+```{r}
+ecfree_hdi_wb_data <- left_join(ecfree_hdi_data, wb_data, by = c("name" = "country", "index year" = "year") )
+```
+
+Filter small countries
+
+```{r}
+ecfree_hdi_wb_data <- ecfree_hdi_wb_data %>% filter(SP.POP.TOTL > small_country_max_pop)
+```
+
+
+### Metrics
+
+```{r}
+range01 <- function(x){(x-min(x, na.rm = TRUE))/(max(x, na.rm = TRUE)-min(x, na.rm = TRUE))}
+```
+
+
+```{r}
+ecfree_hdi_wb_data$country <- ecfree_hdi_wb_data$name
+ecfree_hdi_wb_data$year <- ecfree_hdi_wb_data$`index year`
+ecfree_hdi_wb_data$hdi <- ecfree_hdi_wb_data$hdi_value
+ecfree_hdi_wb_data$efree <- ecfree_hdi_wb_data$`overall score`
+ecfree_hdi_wb_data$population <- ecfree_hdi_wb_data$SP.POP.TOTL
+ecfree_hdi_wb_data$gni_per_cap <- ecfree_hdi_wb_data$NY.GNP.PCAP.PP.CD
+ecfree_hdi_wb_data$gni_per_cap_percent <- ecfree_hdi_wb_data$NY.GNP.PCAP.KD.ZG
+
+ecfree_hdi_wb_data$gdp <- ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD
+ecfree_hdi_wb_data$gini <- ecfree_hdi_wb_data$SI.POV.GINI
+
+
+ecfree_hdi_wb_data$gdp_z <- scale(ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD, center = TRUE, scale = TRUE)
+ecfree_hdi_wb_data$gini_z <- scale(ecfree_hdi_wb_data$SI.POV.GINI, center = TRUE, scale = TRUE)
+ecfree_hdi_wb_data$hdi_z <- scale(ecfree_hdi_wb_data$hdi_value, center = TRUE, scale = TRUE)
+ecfree_hdi_wb_data$efree_z <- scale(ecfree_hdi_wb_data$`overall score`, center = TRUE, scale = TRUE)
+ecfree_hdi_wb_data$gni_z <- scale(ecfree_hdi_wb_data$gni_per_cap, center = TRUE, scale = TRUE)
+
+ecfree_hdi_wb_data$gdp_01 <- range01(ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD)
+ecfree_hdi_wb_data$hdi_01 <- range01(ecfree_hdi_wb_data$hdi_value)
+ecfree_hdi_wb_data$efree_01 <- range01(ecfree_hdi_wb_data$`overall score`)
+ecfree_hdi_wb_data$gini_01 <- range01(ecfree_hdi_wb_data$SI.POV.GINI)
+ecfree_hdi_wb_data$gdp_log01 <- range01(log(ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD))
+ecfree_hdi_wb_data$gni_01 <- range01(ecfree_hdi_wb_data$gni_per_cap)
+```
+
+
+```{r}
+gini_by_country <- ecfree_hdi_wb_data %>% group_by(country) %>% summarise(
+  first_gini_year = year[max(which(!is.na(gini)))], 
+  last_gini_year = year[min(which(!is.na(gini)))], 
+  years_of_gini = last_gini_year - first_gini_year,
+  first_gini_value = gini[max(which(!is.na(gini)))], 
+  last_gini_value = gini[min(which(!is.na(gini)))],
+  gini_change = last_gini_value - first_gini_value,
+  gini_change_by_year = gini_change / years_of_gini,
+  avg_gini = mean(gini, na.rm = TRUE)
+  )
+
+gini_by_country <- gini_by_country %>% filter(years_of_gini > 1)
+gini_by_country$gini_category = ifelse(gini_by_country$gini_change_by_year < 0, "more equal", "less equal")
+
+```
+
+
+```{r}
+gini_by_country %>% 
+  ggplot(aes(x = avg_gini, fill = gini_category)) + geom_histogram()
+```
+```{r}
+#summary(gini_by_country)
+```
+
+```{r}
+efree_by_country <- ecfree_hdi_wb_data %>% group_by(country) %>% summarise(
+  first_efree_year = year[max(which(!is.na(efree)))], 
+  last_efree_year = year[min(which(!is.na(efree)))], 
+  years_of_efree = last_efree_year - first_efree_year,
+  first_efree_value = efree[max(which(!is.na(efree)))], 
+  last_efree_value = efree[min(which(!is.na(efree)))],
+  efree_change = last_efree_value - first_efree_value,
+  efree_change_by_year = efree_change / years_of_efree,
+  avg_efree = mean(efree, na.rm = TRUE)
+  )
+
+efree_by_country <- efree_by_country %>% filter(years_of_efree > 1)
+```
+
+```{r}
+efree_by_country %>% 
+  ggplot(aes(x = avg_efree)) + geom_histogram()
+```
+
+
+```{r}
+ecfree_hdi_wb_data <- left_join(ecfree_hdi_wb_data, gini_by_country, by = c("country"))
+ecfree_hdi_wb_data <- left_join(ecfree_hdi_wb_data, efree_by_country, by = c("country"))
+```
+
+
+
+```{r}
+summary(ecfree_hdi_wb_data)
+```
+
+```{r}
+ecfree_hdi_wb_data %>% 
+  filter(year == 2013) %>% 
+  summarise(n = n())
+```
+
+
+```{r}
+ecfree_hdi_wb_data %>%
+  ggplot(aes(x = gni_per_cap)) +
+  geom_histogram()
+```
+
+
+
+
+
+
+
+
+```{r}
+ecfree_hdi_wb_data %>% filter(country %in% c('Brazil', 'China', 'United Kingdom', 'United States')) %>% arrange(name, `index year`) %>%
+  ggplot(aes( y = hdi, x = efree, colour = country)) + 
+  geom_text(check_overlap = TRUE, aes(label = `index year`)) + 
+  #labs(y = 'GDP', x = 'HDI') +
+  geom_point() + 
+  geom_path()
+```
+
+
+```{r}
+ecfree_hdi_wb_data %>% filter(`index year` == 2017) %>%
+  ggplot(aes( x = log(gni_per_cap), y = hdi, colour = gini_category)) + 
+  labs(title = "GNI vs HDI - 2017") + 
+  geom_text(check_overlap = TRUE, aes(label = name)) + 
+  geom_point()
+```
+
+```{r}
+ecfree_hdi_wb_data %>% filter(year == 2017) %>%
+  ggplot(aes(x = gni_z, y = efree_z)) + 
+  labs(title = "Ec Freedom vs GNI - 2017") + 
+  geom_text(check_overlap = TRUE, aes(label = name)) + 
+  geom_point()
+```
+
+
+```{r}
+ecfree_hdi_wb_data %>% filter(year > 2007) %>%
+  ggplot(aes( x = efree_z, y = hdi)) + 
+  labs(title = "HDI vs EFree - sized by GNI - 2017") + 
+  geom_point() + 
+  geom_text(check_overlap = TRUE, aes(label = name), size = 4) +
+  facet_wrap(~ year)
+  
+```
+
+
+```{r}
+lm_out <- lm(formula = hdi ~ efree + gdp_01, data = ecfree_hdi_wb_data)
+
+summary(lm_out)
+summary(lm_out)$r.squared
+```
+
+```{r}
+ecfree_hdi_wb_data %>% #filter(gini_change_by_year > 0) %>%
+  ggplot(aes(x = hdi, y = gni_per_cap, group = country, colour = gini_change_by_year > 0)) + 
+  geom_point() + 
+  geom_text(check_overlap = TRUE, aes(label = country ), colour = 'black') + 
+  geom_path()
+
+```
+
+
+```{r}
+ecfree_hdi_wb_data %>% filter(`index year` == 2017) %>%
+  ggplot(aes(x = hdi_z, y = efree_z)) + 
+  labs(title = "Ec Freedom vs HDI - 2017") + 
+  geom_text(check_overlap = TRUE, aes(label = name)) + 
+  geom_point()
+```
+
+```{r}
+ecfree_hdi_wb_data %>% #filter(year == 2016) %>%
+  ggplot(aes(x = gini_z, y = hdi_z)) + 
+  labs(title = "Ec Freedom vs HDI") + 
+  geom_text(check_overlap = TRUE, aes(label = name)) + 
+  geom_point()
+```
+
+
+```{r}
+ecfree_hdi_wb_data %>% filter(name %in% c('Brazil', 'United States', 'China', 'Argentina')) %>% filter(!is.na(SI.POV.GINI)) %>% arrange(country, year) %>%
+  ggplot(aes( y = hdi, x = gini, colour = country)) + 
+  geom_text(check_overlap = TRUE, aes(label = `index year`)) + 
+  labs(y = 'HDI', x = 'GINI') +
+  geom_point() + 
+  geom_path()
+```
+## Tern
+
+```{r}
+require(ggtern)
+```
+
+```{r}
+ecfree_hdi_wb_data %>%
+  filter(name == 'Ireland') #%>% select(gni_01, hdi_01, efree_01)
+```
+
+
+```{r}
+ecfree_hdi_wb_data %>%
+  filter(name == 'Ireland') %>%
+  ggtern(aes(x = gni_01 * 100, y = hdi_01 * 100, z = efree_01 * 100)) + 
+  geom_point() + 
+  geom_text(check_overlap = TRUE, aes(label = name)) + 
+  theme_rgbw() 
+```
+
+
+
+## GIS
+
+```{r}
+require("rgdal")
+require("maptools")
+```
+
+
+
+
+## LASSO
+
+```{r}
+require(glmnet)
+```
+
+```{r}
+glm_input <- ecfree_hdi_wb_data %>% filter(!is.na(gni_per_cap)) %>%
+  select(-contains('gni')) %>% 
+  select(-contains('gdp')) %>%
+  select(-contains('gini')) %>%
+  select(-c('name', 'country', 'Country', 'iso3c','date', 'iso2c' )) %>%
+  select(-contains('year'))
+glm_output <- ecfree_hdi_wb_data %>% filter(!is.na(gni_per_cap)) %>% select(gni_per_cap)
+#as.matrix(glm_input)
+#c <- glmnet(as.matrix(glm_input), as.matrix(glm_output), standardize = TRUE, alpha = 1)
+
+#as.matrix(glm_input)
+#as.matrix(glm_output)
+```
+
+
+
+

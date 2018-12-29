@@ -1,1 +1,23 @@
-.App {}
+.App {
+  color: #5d6167;
+  font-family: "Montserrat", sans-serif;
+  .small-blue-title {
+    color: #00c6f3;
+    text-transform: uppercase;
+    font-size: 20px;
+    font-size: 2rem;
+  }
+  .line {
+    width: 100px;
+    border-top: 3px solid #00c6f3;
+    margin-top: 20px;
+    padding-bottom: 40px;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: #111;
+    font-weight: 700;
+  }
+}

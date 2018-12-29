@@ -512,6 +512,27 @@ efree_by_country <- efree_by_country %>% filter(years_of_efree > 1)
 ```
 
 ```{r}
+gni_by_country <- ecfree_hdi_wb_data %>% group_by(country) %>% summarise(
+  first_gni_year = year[max(which(!is.na(gni_per_cap)))], 
+  last_gni_year = year[min(which(!is.na(gni_per_cap)))], 
+  years_of_gni = last_gni_year - first_gni_year,
+  first_gni_value = gni_per_cap[max(which(!is.na(gni_per_cap)))], 
+  last_gni_value = gni_per_cap[min(which(!is.na(gni_per_cap)))],
+  gni_change = last_gni_value - first_gni_value,
+  gni_change_by_year = gni_change / years_of_gni,
+  avg_gni = mean(gni_per_cap, na.rm = TRUE)
+  )
+
+#efree_by_country <- efree_by_country %>% filter(years_of_efree > 1)
+```
+
+```{r}
+gni_by_country %>% filter(gni_change_by_year < 500)
+  #ggplot(aes(x = gni_change_by_year)) + geom_histogram()
+```
+
+
+```{r}
 efree_by_country %>% 
   ggplot(aes(x = avg_efree)) + geom_histogram()
 ```
@@ -559,6 +580,16 @@ ecfree_hdi_wb_data %>% filter(country %in% c('Brazil', 'China', 'United Kingdom'
 
 
 ```{r}
+ecfree_hdi_wb_data %>% filter(country %in% c('Brazil')) %>% arrange(name, `index year`) %>%
+  ggplot(aes( y = hdi_01, x = efree_01, colour = country)) + 
+  geom_text(check_overlap = TRUE, aes(label = year), size = 5) + 
+  #labs(y = 'GDP', x = 'HDI') +
+  geom_point(aes(size = gni_per_cap)) + 
+  geom_path(size = 1) + 
+  
+```
+
+```{r}
 ecfree_hdi_wb_data %>% filter(`index year` == 2017) %>%
   ggplot(aes( x = log(gni_per_cap), y = hdi, colour = gini_category)) + 
   labs(title = "GNI vs HDI - 2017") + 
@@ -568,7 +599,7 @@ ecfree_hdi_wb_data %>% filter(`index year` == 2017) %>%
 
 ```{r}
 ecfree_hdi_wb_data %>% filter(year == 2017) %>%
-  ggplot(aes(x = gni_z, y = efree_z)) + 
+  ggplot(aes(x = log(gni_per_cap), y = efree_z)) + 
   labs(title = "Ec Freedom vs GNI - 2017") + 
   geom_text(check_overlap = TRUE, aes(label = name)) + 
   geom_point()
@@ -585,9 +616,39 @@ ecfree_hdi_wb_data %>% filter(year > 2007) %>%
   
 ```
 
+### Save File
 
 ```{r}
-lm_out <- lm(formula = hdi ~ efree + gdp_01, data = ecfree_hdi_wb_data)
+
+write_csv(ecfree_hdi_wb_data, "output/ecfree_hdi_wb_data.csv")
+
+```
+
+
+```{r}
+gov_data_save <- ecfree_hdi_wb_data %>% select(country, iso3c, iso2c, year, population, gni_per_cap, gni_per_cap_percent, gni_01, gni_z, efree, efree_01, efree_z, hdi, hdi_01, hdi_z)
+write_csv(gov_data_save, "output/gov_data_year.csv")
+```
+
+
+
+```{r}
+gov_data_2017 <- gov_data_save %>% filter(year == 2017)
+
+gov_vs_gov_by_year <- inner_join(gov_data, gov_data_2017, by = c("country" = "country"))
+```
+
+
+```{r}
+hdi_data %>% filter(year_n == 2017) %>% summarise(n = n())
+```
+
+
+
+## Linear Model
+
+```{r}
+lm_out <- lm(formula = log(gni_per_cap) ~ efree + hdi, data = ecfree_hdi_wb_data)
 
 summary(lm_out)
 summary(lm_out)$r.squared
@@ -605,7 +666,7 @@ ecfree_hdi_wb_data %>% #filter(gini_change_by_year > 0) %>%
 
 ```{r}
 ecfree_hdi_wb_data %>% filter(`index year` == 2017) %>%
-  ggplot(aes(x = hdi_z, y = efree_z)) + 
+  ggplot(aes(x = hdi_z, y = gni_per_cap)) + 
   labs(title = "Ec Freedom vs HDI - 2017") + 
   geom_text(check_overlap = TRUE, aes(label = name)) + 
   geom_point()
@@ -621,10 +682,10 @@ ecfree_hdi_wb_data %>% #filter(year == 2016) %>%
 
 
 ```{r}
-ecfree_hdi_wb_data %>% filter(name %in% c('Brazil', 'United States', 'China', 'Argentina')) %>% filter(!is.na(SI.POV.GINI)) %>% arrange(country, year) %>%
-  ggplot(aes( y = hdi, x = gini, colour = country)) + 
+ecfree_hdi_wb_data %>% filter(name %in% c('Brazil', 'United States', 'China', 'Argentina', 'Niger')) %>% filter(!is.na(SI.POV.GINI)) %>% arrange(country, year) %>%
+  ggplot(aes( y = hdi, x = gni_per_cap, colour = country)) + 
   geom_text(check_overlap = TRUE, aes(label = `index year`)) + 
-  labs(y = 'HDI', x = 'GINI') +
+  #labs(y = 'HDI', x = 'GINI') +
   geom_point() + 
   geom_path()
 ```
@@ -636,13 +697,13 @@ require(ggtern)
 
 ```{r}
 ecfree_hdi_wb_data %>%
-  filter(name == 'Ireland') #%>% select(gni_01, hdi_01, efree_01)
+  filter(name == 'Singapore') %>% select(gni_01, hdi_01, efree_01)
 ```
 
 
 ```{r}
 ecfree_hdi_wb_data %>%
-  filter(name == 'Ireland') %>%
+  filter(name == 'Singapore') %>%
   ggtern(aes(x = gni_01 * 100, y = hdi_01 * 100, z = efree_01 * 100)) + 
   geom_point() + 
   geom_text(check_overlap = TRUE, aes(label = name)) + 

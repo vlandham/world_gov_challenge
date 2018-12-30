@@ -164,13 +164,16 @@ class App extends Component {
             <Col sm={9}>
               <div className="line" />
               <p>
-                What makes a good government? Some would say this is a good
-                question.
+                What makes a good government? Often when we think of successful
+                governments, we focus on the output of its people and its
+                mightiness when compared to its peers. But perhaps a more
+                important measure of a good government is its ability to provide
+                comfort and success to the individuals it governs.
               </p>
-              <p>
-                What makes a good government? Some would say this is a good
-                question.
-              </p>
+              <blockquote cite="Thomas Jefferson">
+                The care of human life and happiness, and not their destruction,
+                is the first and only object of good government.
+              </blockquote>
             </Col>
           </Row>
           <Row>

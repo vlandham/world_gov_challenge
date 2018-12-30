@@ -4,9 +4,13 @@
   "private": true,
   "dependencies": {
     "bootstrap": "4",
+    "d3": "^5.7.0",
     "gh-pages": "^2.0.1",
+    "lodash.debounce": "^4.0.8",
+    "lodash.isfinite": "^3.3.2",
     "node-sass": "^4.11.0",
     "react": "^16.7.0",
+    "react-computed-props": "^0.1.2",
     "react-dom": "^16.7.0",
     "react-scripts": "2.1.2",
     "reactstrap": "6.5.0"

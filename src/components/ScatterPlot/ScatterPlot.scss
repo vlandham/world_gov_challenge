@@ -1,0 +1,25 @@
+@import "../../styles/colors.scss";
+.ScatterPlot {
+  .highlight-circle {
+    pointer-events: none;
+  }
+  .dot {
+    opacity: 0.8;
+    &.highlight {
+      // stroke: black;
+      // stroke-width: 1px;
+    }
+    &.selected {
+      fill: $highlight_color;
+    }
+    &.dim {
+      opacity: 0.4;
+    }
+  }
+  .chart-icons {
+    padding-top: 10px;
+    button {
+      margin-left: 10px;
+    }
+  }
+}

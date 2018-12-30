@@ -6,6 +6,7 @@ import AutoWidth from "../AutoWidth/AutoWidth";
 import ScatterPlot from "../ScatterPlot/ScatterPlot";
 import { tableContent } from "../tooltip/tooltip";
 import { formatNumber } from "../../utils/format";
+import SmallMultipleConnected from "../SmallMultipleConnected/SmallMultipleConnected";
 
 import "./App.scss";
 
@@ -146,6 +147,12 @@ class App extends Component {
     );
   }
 
+  renderSmallMult() {
+    const { data } = this.state;
+
+    return <SmallMultipleConnected data={data} />;
+  }
+
   /**
    *
    */
@@ -174,11 +181,24 @@ class App extends Component {
                 The care of human life and happiness, and not their destruction,
                 is the first and only object of good government.
               </blockquote>
+              <p>Something Something Something.</p>
             </Col>
           </Row>
           <Row>
-            <Col md={5}>{this.renderScatterGNIvsKDI()}</Col>
-            <Col md={5}>{this.renderScatterGNIvsEfree()}</Col>
+            <Col>
+              <h2>Quality of Life is Connected to Progress</h2>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={2} />
+            <Col sm={9}>
+              <div className="line" />
+              <p>But we don't have to have it only one way.</p>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={6}>{this.renderScatterGNIvsKDI()}</Col>
+            <Col md={6}>{this.renderScatterGNIvsEfree()}</Col>
           </Row>
           <Row>
             <Col sm={2} />
@@ -186,6 +206,21 @@ class App extends Component {
               <div className="blank" />
               <p>But that is not the whole story.</p>
             </Col>
+          </Row>
+          <Row>
+            <Col>
+              <h2>Progress of Countries</h2>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={2} />
+            <Col sm={9}>
+              <div className="line" />
+              <p>Here is some data.</p>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12}>{this.renderSmallMult()}</Col>
           </Row>
         </Container>
       </div>

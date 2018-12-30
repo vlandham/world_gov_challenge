@@ -3,6 +3,8 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+https://informationisbeautiful.net/2018/announcing-the-world-data-visualization-prize-a-40k-dataviz-challenge/
+
 ```{r}
 library(tidyverse)
 ```
@@ -279,6 +281,8 @@ gov_data %>%
 
 ## HDI
 
+http://hdr.undp.org/en/indicators/137506 
+
 Human Development Index (HDI)
 A composite index measuring average achievement in three basic dimensions of human development—
 * a long and healthy life, 
@@ -357,6 +361,10 @@ ecfree_hdi_data %>% filter(name == 'South Korea' ) %>% arrange(`index year`) %>%
 ```
 
 ## World Bank Data
+
+https://cran.r-project.org/web/packages/wbstats/vignettes/Using_the_wbstats_package.html
+
+https://data.worldbank.org/indicator
 
 An international dollar has the same purchasing power over GNI as a U.S. dollar has in the United States. 
 
@@ -635,12 +643,12 @@ write_csv(gov_data_save, "output/gov_data_year.csv")
 ```{r}
 gov_data_2017 <- gov_data_save %>% filter(year == 2017)
 
-gov_vs_gov_by_year <- inner_join(gov_data, gov_data_2017, by = c("country" = "country"))
+gov_vs_gov_by_year <- left_join(gov_data %>% filter(population > small_country_max_pop), gov_data_2017, by = c("country" = "country"))
 ```
 
 
 ```{r}
-hdi_data %>% filter(year_n == 2017) %>% summarise(n = n())
+gov_vs_gov_by_year %>% filter(is.na(gni_per_cap))
 ```
 
 

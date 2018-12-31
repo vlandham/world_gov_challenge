@@ -73,10 +73,16 @@ class App extends Component {
     this.state = {
       data: [],
       focusYear: 2017,
-      scatterHover: null
+      scatterHover: null,
+      configs: {
+        dataDisplay: "hdi_gni",
+        sortOrder: "alpha",
+        scale: "global"
+      }
     };
 
     this.handleScatterHover = this.handleScatterHover.bind(this);
+    this.handleConfigClick = this.handleConfigClick.bind(this);
   }
 
   /**
@@ -93,6 +99,12 @@ class App extends Component {
     } else {
       this.setState({ scatterHover: null });
     }
+  }
+
+  handleConfigClick(configId, valueId) {
+    const { configs } = this.state;
+    configs[configId] = valueId;
+    this.setState({ configs });
   }
 
   /**
@@ -113,8 +125,8 @@ class App extends Component {
   renderScatterGNIvsKDI() {
     const { data, focusYear, scatterHover } = this.state;
     const displayData = data.filter(d => d.year === focusYear);
-    const xFunc = d => d.gni_per_cap;
     const yFunc = d => d.hdi;
+    const xFunc = d => d.gni_per_cap;
 
     const xLabel = "GNI per Capita";
     const yLabel = "Human Development Index";
@@ -179,10 +191,30 @@ class App extends Component {
     );
   }
 
+  /**
+   *
+   */
   renderSmallMult() {
-    const { data } = this.state;
+    const { data, configs } = this.state;
 
-    return <SmallMultipleConnected data={data} />;
+    const [yMetric, xMetric] = configs.dataDisplay.split("_");
+
+    return (
+      <SmallMultipleConnected
+        data={data}
+        xMetric={xMetric}
+        yMetric={yMetric}
+        scale={configs.scale}
+      />
+    );
+  }
+
+  /**
+   *
+   */
+  renderConfigPanel() {
+    const { configs } = this.state;
+    return <ConfigurePanel onClick={this.handleConfigClick} />;
   }
 
   /**
@@ -247,7 +279,7 @@ class App extends Component {
           <Row>
             <Col sm={12}>
               <div className="line" />
-              <ConfigurePanel />
+              {this.renderConfigPanel()}
             </Col>
           </Row>
           <Row>

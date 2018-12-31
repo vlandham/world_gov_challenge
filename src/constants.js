@@ -22,3 +22,22 @@ export const METRICS = {
     display: "year"
   }
 };
+
+export const CONFIGS = {
+  dataDisplay: {
+    options: [
+      { label: "HDI vs GNI", id: "hdi_gni" },
+      { label: "Economic Freedom vs GNI", id: "efree_gni" },
+      { label: "HDI vs Economic Freedom", id: "hdi_efree" }
+    ]
+  },
+  sortOrder: {
+    options: [{ label: "Alphabetically", id: "alpha" }]
+  },
+  scale: {
+    options: [
+      { label: "Global", id: "global" },
+      { label: "Country-level", id: "local" }
+    ]
+  }
+};

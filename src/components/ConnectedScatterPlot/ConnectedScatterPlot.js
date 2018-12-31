@@ -223,8 +223,14 @@ class ConnectedScatterPlot extends PureComponent {
       .style("pointer-events", "none")
       .style("display", "none");
 
-    this.xAxis = this.g.append("g").classed("x-axis", true);
-    this.yAxis = this.g.append("g").classed("y-axis", true);
+    this.xAxis = this.g
+      .append("g")
+      .classed("x-axis", true)
+      .style("pointer-events", "none");
+    this.yAxis = this.g
+      .append("g")
+      .classed("y-axis", true)
+      .style("pointer-events", "none");
     this.yAxisLabel = this.g
       .append("text")
       .attr("class", "axis-label")

@@ -6,36 +6,33 @@ import {
   DropdownItem
 } from "reactstrap";
 
-import "./ConfigurePanel.scss";
+import { CONFIGS } from "../../constants";
 
-const DROPDOWNS = {
-  dataDisplay: {
-    options: [
-      { label: "GNI vs HDI", id: "gni_hdi" },
-      { label: "GNI vs Economic Freedom", id: "gni_efree" },
-      { label: "HDI vs Economic Freedom", id: "hdi_efree" }
-    ]
-  },
-  sortOrder: {
-    options: [{ label: "Alphabetically", id: "alpha" }]
-  },
-  scale: {
-    options: [
-      { label: "Global", id: "global" },
-      { label: "Country-level", id: "local" }
-    ]
-  }
-};
+import "./ConfigurePanel.scss";
 
 class ConfigurePanel extends Component {
   constructor(props) {
     super(props);
 
     this.toggle = this.toggle.bind(this);
+    this.click = this.click.bind(this);
+
     this.state = {
-      dataDisplay: { dropdownOpen: false, selectIndex: 0 },
-      sortOrder: { dropdownOpen: false, selectIndex: 0 },
-      scale: { dropdownOpen: false, selectIndex: 0 }
+      dataDisplay: {
+        dropdownOpen: false,
+        selectIndex: 0,
+        selectedId: CONFIGS.dataDisplay.options[0].id
+      },
+      sortOrder: {
+        dropdownOpen: false,
+        selectIndex: 0,
+        selectedId: CONFIGS.sortOrder.options[0].id
+      },
+      scale: {
+        dropdownOpen: false,
+        selectIndex: 0,
+        selectedId: CONFIGS.scale.options[0].id
+      }
     };
   }
 
@@ -47,11 +44,30 @@ class ConfigurePanel extends Component {
     });
   }
 
+  click(dropdownId, option, optionIndex) {
+    const { onClick } = this.props;
+    this.setState(prevState => {
+      const data = prevState[dropdownId];
+      data.selectIndex = optionIndex;
+      data.selectedId = option.id;
+      return { [dropdownId]: data };
+    });
+
+    if (onClick) {
+      onClick(dropdownId, option.id);
+    }
+  }
+
   renderDropdown(dropdownId) {
     const dropdownState = this.state[dropdownId];
-    const data = DROPDOWNS[dropdownId];
-    const items = data.options.map(d => (
-      <DropdownItem key={d.id}>{d.label}</DropdownItem>
+    const data = CONFIGS[dropdownId];
+    const items = data.options.map((d, index) => (
+      <DropdownItem
+        key={d.id}
+        onClick={this.click.bind(this, dropdownId, d, index)}
+      >
+        {d.label}
+      </DropdownItem>
     ));
 
     const display = data.options[dropdownState.selectIndex];

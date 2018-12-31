@@ -51,6 +51,14 @@ function chartProps(props) {
 
   dataGrouped = sortData(dataGrouped, sortOrder, xFunc, yFunc, zFunc);
 
+  // var colorScale = d3
+  //   .scaleSequential(d3.interpolatePlasma)
+  //   .domain([2020, 1995]);
+
+  var colorScale = d3
+    .scaleSequential(d3.interpolateOranges)
+    .domain([1990, 2020]);
+
   const tooltipTextFunc = d => {
     const tooltipData = {
       [xLabel]: d[METRICS[xMetric].display],
@@ -71,6 +79,7 @@ function chartProps(props) {
     xFunc,
     yFunc,
     zFunc,
+    colorScale,
     tooltipTextFunc
   };
 }
@@ -104,7 +113,9 @@ class SmallMultipleScatter extends Component {
       zLabel,
       tooltipTextFunc,
       xMetric,
-      yMetric
+      yMetric,
+      scale,
+      colorScale
     } = this.props;
     return (
       <div key={chartData.key} className="small-multiple">
@@ -122,8 +133,10 @@ class SmallMultipleScatter extends Component {
             xExtent={EXTENT}
             yExtent={EXTENT}
             tooltipTextFunc={tooltipTextFunc}
+            colorScale={colorScale}
             xMetric={xMetric}
             yMetric={yMetric}
+            scale={scale}
           />
         </AutoWidth>
       </div>

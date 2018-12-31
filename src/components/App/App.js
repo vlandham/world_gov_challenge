@@ -93,7 +93,7 @@ class App extends Component {
       configs: {
         dataDisplay: "hdi_gdp",
         sortOrder: "alpha",
-        scale: "global"
+        scale: "local"
       }
     };
 
@@ -229,7 +229,6 @@ class App extends Component {
    *
    */
   renderConfigPanel() {
-    const { configs } = this.state;
     return <ConfigurePanel onClick={this.handleConfigClick} />;
   }
 

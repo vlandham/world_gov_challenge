@@ -42,8 +42,8 @@ export const CONFIGS = {
   },
   scale: {
     options: [
-      { label: "Global", id: "global" },
-      { label: "Country-level", id: "local" }
+      { label: "Country-level", id: "local" },
+      { label: "Global", id: "global" }
     ]
   }
 };

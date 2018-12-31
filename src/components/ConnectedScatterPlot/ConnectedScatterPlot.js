@@ -8,16 +8,19 @@ import { floatingTooltip } from "../tooltip/tooltip";
 import "./ConnectedScatterPlot.scss";
 
 function chartProps(props) {
-  const { data, xFunc, yFunc, height, width } = props;
+  const { data, xFunc, yFunc, zFunc, colorScale, height, width, scale } = props;
 
   let { xExtent, yExtent } = props;
 
   const padding = {
     top: 20,
     right: 20,
-    bottom: 50,
-    left: 60
+    bottom: 40,
+    left: 40
   };
+
+  const radius = scale === "local" ? 5 : 2;
+  const lineWidth = scale === "local" ? 3 : 1;
 
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
@@ -41,7 +44,15 @@ function chartProps(props) {
   const xValue = d => xScale(xFunc(d));
   const yValue = d => yScale(yFunc(d));
 
-  const colorValue = d => "#ddd";
+  const line = d3
+    .line()
+    .x(xValue)
+    .y(yValue);
+
+  let colorValue = d => "#ddd";
+  if (colorScale) {
+    colorValue = d => colorScale(zFunc(d));
+  }
 
   let voronoiDiagram = null;
 
@@ -61,6 +72,7 @@ function chartProps(props) {
 
   return {
     dataFiltered,
+    line,
     padding,
     plotHeight,
     plotWidth,
@@ -69,6 +81,8 @@ function chartProps(props) {
     xValue,
     yValue,
     colorValue,
+    radius,
+    lineWidth,
     voronoiDiagram,
     mouseRadius,
     xAxis,
@@ -197,6 +211,9 @@ class ConnectedScatterPlot extends PureComponent {
     this.zoomTransform = d3.zoomIdentity;
 
     const cRoot = d3.select(this.root);
+
+    // var defs = cRoot.append("defs");
+
     this.g = cRoot.append("g");
 
     const that = this;
@@ -227,10 +244,20 @@ class ConnectedScatterPlot extends PureComponent {
       .append("g")
       .classed("x-axis", true)
       .style("pointer-events", "none");
+
+    this.xAxis.append("line").classed("bar", true);
+    this.xAxis.append("text").classed("low", true);
+    this.xAxis.append("text").classed("high", true);
+
     this.yAxis = this.g
       .append("g")
       .classed("y-axis", true)
       .style("pointer-events", "none");
+
+    this.yAxis.append("line").classed("bar", true);
+    this.yAxis.append("text").classed("low", true);
+    this.yAxis.append("text").classed("high", true);
+
     this.yAxisLabel = this.g
       .append("text")
       .attr("class", "axis-label")
@@ -252,7 +279,33 @@ class ConnectedScatterPlot extends PureComponent {
     this.g.attr("transform", `translate(${padding.left} ${padding.top})`);
 
     this.updateChart();
+    // this.updateAxesold();
     this.updateAxes();
+  }
+
+  /**
+   *
+   */
+  updateLine() {
+    const { dataFiltered, line, lineWidth } = this.props;
+    const lineBinding = this.chart.selectAll(".line").data([dataFiltered]);
+
+    const lineEnter = lineBinding
+      .enter()
+      .append("path")
+      .classed("line", true);
+
+    const lineMerged = lineEnter.merge(lineBinding);
+    lineMerged
+      .attr("fill", "none")
+      .attr("stroke", "#888")
+      // .attr("stroke", "url(#svgGradient)")
+      .attr("stroke-width", lineWidth)
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+      .attr("d", line);
+
+    lineBinding.exit().remove();
   }
 
   /**
@@ -260,6 +313,8 @@ class ConnectedScatterPlot extends PureComponent {
    */
   updateChart() {
     const { dataFiltered, xValue, yValue, colorValue, radius } = this.props;
+
+    this.updateLine();
 
     const binding = this.chart
       .selectAll(".dot")
@@ -282,10 +337,91 @@ class ConnectedScatterPlot extends PureComponent {
     binding.exit().remove();
   }
 
+  updateAxes() {
+    const { xLabel, yLabel, plotHeight, plotWidth, padding } = this.props;
+
+    this.xAxis.attr("transform", `translate(${0}, ${plotHeight})`);
+    this.xAxis.attr("font-size", 10).attr("fill", "none");
+    this.yAxis.attr("font-size", 10).attr("fill", "none");
+
+    this.xAxis
+      .select(".bar")
+      .attr("x1", 0)
+      .attr("x2", plotWidth)
+      .attr("y1", 0)
+      .attr("y2", 0)
+      .style("stroke-width", 1)
+      .style("stroke", "black")
+      .style("fill", "none");
+
+    this.xAxis
+      .select(".low")
+      .attr("y", 9)
+      .attr("fill", "#333")
+      .attr("dy", "0.6em")
+      .text("low");
+
+    this.xAxis
+      .select(".high")
+      .attr("y", 9)
+      .attr("x", plotWidth)
+      .attr("text-anchor", "end")
+      .attr("fill", "#333")
+      .attr("dy", "0.6em")
+      .text("high");
+
+    this.yAxis
+      .select(".bar")
+      .attr("x1", 0)
+      .attr("x2", 0)
+      .attr("y1", 0)
+      .attr("y2", plotHeight)
+      .style("stroke-width", 1)
+      .style("stroke", "black")
+      .style("fill", "none");
+
+    this.yAxis
+      .select(".low")
+      .attr("y", 9)
+      .attr("fill", "#333")
+      .attr("dy", "0.6em")
+      .attr(
+        "transform",
+        `rotate(270) translate(${-plotHeight} ${-padding.left + 18})`
+      )
+      .text("low");
+
+    this.yAxis
+      .select(".high")
+      .attr("y", 9)
+      .attr("x", 0)
+      .attr("text-anchor", "end")
+      .attr("fill", "#333")
+      .attr("dy", "0.6em")
+      .attr("transform", `rotate(270) translate(${0} ${-padding.left + 18})`)
+      .text("high");
+
+    this.yAxisLabel
+      .attr(
+        "transform",
+        `rotate(270) translate(${-plotHeight / 2} ${-padding.left + 18})`
+      )
+      .text(yLabel);
+
+    this.xAxisLabel
+      .attr(
+        "transform",
+        `translate(${plotWidth / 2} ${plotHeight +
+          padding.top +
+          padding.bottom / 3})`
+      )
+      .text(xLabel);
+  }
+
   /**
    *
    */
-  updateAxes() {
+  updateAxesold() {
     const {
       xAxis,
       yAxis,

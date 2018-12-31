@@ -87,8 +87,8 @@ class ConfigurePanel extends Component {
     return (
       <div className="ConfigurePanel">
         Displaying {this.renderDropdown("dataDisplay")} sorted{" "}
-        {this.renderDropdown("sortOrder")} using a{" "}
-        {this.renderDropdown("scale")} scale.
+        {this.renderDropdown("sortOrder")} for country data from 2010 to 2017
+        using a {this.renderDropdown("scale")} scale.
       </div>
     );
   }

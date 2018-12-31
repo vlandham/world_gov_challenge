@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import addComputedProps from "react-computed-props";
 import * as d3 from "d3";
 import ConnectedScatterPlot from "../ConnectedScatterPlot/ConnectedScatterPlot";
+import isfinite from "lodash.isfinite";
 
 import { tableContent } from "../tooltip/tooltip";
 import { formatNumber } from "../../utils/format";
@@ -12,13 +13,27 @@ import AutoWidth from "../AutoWidth/AutoWidth";
 
 import { METRICS } from "../../constants";
 
+function sortData(data, sortOrder, xFunc, yFunc, zFunc) {
+  return data;
+}
+
+function filterData(data, threshold, xFunc, yFunc) {
+  return data.filter(country => {
+    const validYears = country.values.filter(year => {
+      return isfinite(xFunc(year)) && isfinite(yFunc(year));
+    });
+
+    return validYears.length > threshold;
+  });
+}
+
 /**
  *
  * @param {*} props
  */
 function chartProps(props) {
   const { xMetric, yMetric, scale, sortOrder } = props;
-  const dataGrouped = d3
+  let dataGrouped = d3
     .nest()
     .key(d => d.country)
     .entries(props.data);
@@ -32,6 +47,10 @@ function chartProps(props) {
   const yFunc = d => d[METRICS[yMetric][scale]];
   const zFunc = d => d[METRICS[zMetric].display];
 
+  dataGrouped = filterData(dataGrouped, 4, xFunc, yFunc);
+
+  dataGrouped = sortData(dataGrouped, sortOrder, xFunc, yFunc, zFunc);
+
   const tooltipTextFunc = d => {
     const tooltipData = {
       [xLabel]: d[METRICS[xMetric].display],
@@ -42,6 +61,7 @@ function chartProps(props) {
       valueFormat: formatNumber
     });
   };
+
   console.log(dataGrouped);
   return {
     dataGrouped,
@@ -55,7 +75,7 @@ function chartProps(props) {
   };
 }
 
-const EXTENT = [0, 1];
+const EXTENT = [-0.1, 1.1];
 
 /**
  *

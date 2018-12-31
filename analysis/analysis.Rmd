@@ -9,9 +9,13 @@ My hope in releasing this quick analysis is to provide transparency to the final
 
 ## Good Government Data
 
+Let's start with a look at the provided "what makes good government" dataset, which you can find [from the challenge homepage](https://informationisbeautiful.net/2018/announcing-the-world-data-visualization-prize-a-40k-dataviz-challenge/).
+
+My angle when looking at this data is skewed toward the idea that good government should support the well-being of the people it governs. My hypothesis is that more traditional measures of government performance and rank might be connected to this populous well-being. Meaning you don't have to have one or the other - you can have happy people that are productive people, which in turn helps increase the power of the government.
+
 ### Loading Data
 
-First, we need to load the data. I'm focusing on the "What Makes a Government Good" dataset, which you can find [from the challenge homepage](https://informationisbeautiful.net/2018/announcing-the-world-data-visualization-prize-a-40k-dataviz-challenge/). I downloaded a CSV version of the Google Doc sheet, and cleaned out the information rows. Its in the `data` directory. 
+First, we need to load the data.  I downloaded a CSV version of the Google Doc sheet, and cleaned out the information rows. Its in the `data` directory. 
 
 We will use the wonderful [tidyverse](https://www.tidyverse.org/) collection of packages for most of this, so let's load that now.
 
@@ -200,7 +204,7 @@ gov_data %>%
 
 It is not too surprising to see high correlation between SEDA, HDI, economic freedom, and GDP. 
 
-I am a bit surprised that the happy planet index is not as highly correlated with these measures as well - but perhaps that is because of the environment impact aspect of this metric. 
+I am a bit surprised that the happy planet index is not as highly correlated with these measures as well - but perhaps that is because of the environment focus of this metric. There is not much correlation between Happy Planet and the GDP. This is unfortunate - as we can't really make an argument for an improved environmental impact making an improved GDP - at least not at the time being.
 
 It is also surprising that the Gini coefficient is not more negatively correlated with some of these other combo-metrics. SEDA takes inequality into account as part of its calculation so that explains why it is the most negatively correlated. 
 
@@ -235,6 +239,14 @@ summary(lm_out)
 
 So, roughly speaking, These inputs capture ~80% of the variability in the log-transformed GDP (we use the log of GDP to make that exponential relationship we saw before linear).
 
+At this point, I started thinking about the progress of an individual country. 
+
+The comparisons we have looked at show a snap-shot of how countries are performing now, but what are the global and local trends? Where have these countries _been_ to reach this spot? Are we moving forward with these metrics of human progress, or backwards? Is there a connection between the relative performance of a country over time and its GDP? 
+
+I wanted to find the answers to some of these questions. And to do that, I need historical data. 
+
 
 ### Adding Historic Data
+
+Fortunately, the starting dataset provided references to the sources for all the columns of data. 
 

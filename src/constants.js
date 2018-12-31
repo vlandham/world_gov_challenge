@@ -5,6 +5,12 @@ export const METRICS = {
     global: "hdi_norm",
     local: "hdi_norm_local"
   },
+  gdp: {
+    label: "GDP per Capita",
+    display: "gdp_per_cap",
+    global: "gdp_norm",
+    local: "gdp_norm_local"
+  },
   gni: {
     label: "GNI per Capita",
     display: "gni_per_cap",
@@ -26,8 +32,8 @@ export const METRICS = {
 export const CONFIGS = {
   dataDisplay: {
     options: [
-      { label: "HDI vs GNI", id: "hdi_gni" },
-      { label: "Economic Freedom vs GNI", id: "efree_gni" },
+      { label: "HDI vs GDP", id: "hdi_gdp" },
+      { label: "Economic Freedom vs GDP", id: "efree_gdp" },
       { label: "HDI vs Economic Freedom", id: "hdi_efree" }
     ]
   },

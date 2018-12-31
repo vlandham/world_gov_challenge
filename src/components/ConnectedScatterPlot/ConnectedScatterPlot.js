@@ -51,7 +51,7 @@ function chartProps(props) {
       .voronoi()
       .x(d => xValue(d) + pixelJitter())
       .y(d => yValue(d) + pixelJitter())
-      .size([plotWidth, plotHeight])(data);
+      .size([plotWidth, plotHeight])(dataFiltered);
   }
 
   const mouseRadius = plotWidth / 3;

@@ -5,7 +5,7 @@ import { Container, Row, Col } from "reactstrap";
 import AutoWidth from "../AutoWidth/AutoWidth";
 import ScatterPlot from "../ScatterPlot/ScatterPlot";
 import { tableContent } from "../tooltip/tooltip";
-import { formatNumber } from "../../utils/format";
+import { formatNumber, roundNumber } from "../../utils/format";
 import SmallMultipleConnected from "../SmallMultipleConnected/SmallMultipleConnected";
 
 import "./App.scss";
@@ -16,14 +16,19 @@ function getData() {
   return d3.csv(changesPath);
 }
 
-const STRING_COLUMNS = ["country", "iso3c", "iso2c"];
+const STRING_COLUMNS = ["country", "iso3c", "iso2c", "region", "sub-region"];
+const ROUND_COLUMNS = {
+  gdp_per_cap: 3
+};
 const NULL_STRING = "NA";
 
 function normalizeMinMax(data, attr, normAttr) {
   const minData = d3.min(data, d => d[attr]);
   const maxData = d3.max(data, d => d[attr]);
   data.forEach(datum => {
-    datum[normAttr] = (datum[attr] - minData) / (maxData - minData);
+    datum[normAttr] = datum[attr]
+      ? (datum[attr] - minData) / (maxData - minData)
+      : NaN;
   });
 
   return data;
@@ -39,14 +44,24 @@ function processData(data) {
       if (!STRING_COLUMNS.includes(key)) {
         datum[key] = datum[key] === NULL_STRING ? null : +datum[key];
       }
+      if (ROUND_COLUMNS[key]) {
+        datum[key] = datum[key]
+          ? roundNumber(datum[key], ROUND_COLUMNS[key])
+          : null;
+      }
     });
 
     datum.key = `${datum.country}:${datum.year}`;
   });
 
+  // FILTER LOW POPULATION
+  const MIN_POP = 5000000;
+  data = data.filter(d => d.population > MIN_POP);
+
   normalizeMinMax(data, "hdi", "hdi_norm");
   normalizeMinMax(data, "gni_per_cap", "gni_norm");
   normalizeMinMax(data, "efree", "efree_norm");
+  normalizeMinMax(data, "gdp_per_cap", "gdp_norm");
 
   // nest by country to get normalized by country
   const dataByCountry = d3
@@ -55,8 +70,9 @@ function processData(data) {
     .entries(data);
 
   dataByCountry.forEach(country => {
-    normalizeMinMax(country.values, "hdi", "hdi_norm_local");
+    normalizeMinMax(country.values, "gdp_per_cap", "gdp_norm_local");
     normalizeMinMax(country.values, "gni_per_cap", "gni_norm_local");
+    normalizeMinMax(country.values, "hdi", "hdi_norm_local");
     normalizeMinMax(country.values, "efree", "efree_norm_local");
   });
 
@@ -75,7 +91,7 @@ class App extends Component {
       focusYear: 2017,
       scatterHover: null,
       configs: {
-        dataDisplay: "hdi_gni",
+        dataDisplay: "hdi_gdp",
         sortOrder: "alpha",
         scale: "global"
       }

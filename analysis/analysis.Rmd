@@ -1,0 +1,240 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Welcome to the World Data Visualization Challenge Exploration Notebook! Let's dig into how I ([Jim Vallandingham](http://vallandingham.me/)) started the analysis of this data, found additional related historical data, and tried to find a story in it all.
+
+My hope in releasing this quick analysis is to provide transparency to the final visualization, and to improve my analysis process.
+
+## Good Government Data
+
+### Loading Data
+
+First, we need to load the data. I'm focusing on the "What Makes a Government Good" dataset, which you can find [from the challenge homepage](https://informationisbeautiful.net/2018/announcing-the-world-data-visualization-prize-a-40k-dataviz-challenge/). I downloaded a CSV version of the Google Doc sheet, and cleaned out the information rows. Its in the `data` directory. 
+
+We will use the wonderful [tidyverse](https://www.tidyverse.org/) collection of packages for most of this, so let's load that now.
+
+```{r}
+library(tidyverse)
+```
+
+Now load the data, indicating the `-` is used for missing values in the CSV.
+
+```{r}
+filename <- "data/WDVP_good_gov.csv"
+gov_data <- read_csv(filename, na = '-')
+```
+
+
+There are some spacer columns in the original Google Sheet - so we get some warnings. This is nothing to worry about though. 
+
+### Metric Descriptions
+
+Before we dive in, it might be worthwhile to talk a bit about some of the metrics this dataset contains. Some are pretty sophisticated composite values that I wanted to learn a bit more about before I charged ahead with the visualization and analysis. 
+
+#### GDP
+
+First the basics: GDP. I know its used everywhere, all the time, but I wanted to get a refresher on the details. 
+
+While looking for pros/cons of GDP as a performance measure, I found an article about [why the GDP sucks](https://howwegettonext.com/gdp-sucks-here-are-some-better-alternatives-88cf2bfec017) which lists some alternatives. Lucky for me (thanks to the foresight of the Information is Beautiful data collectors), many of these alternatives are in the government dataset we are looking at. 
+
+Below are some nice quotes from that article, summarising in plain-english what these metrics are about.
+
+#### Human Development Index (HDI)
+
+> Alongside financial measures, the Human Development Index combines statistics on life expectancy, education, and income per capita to rank countries into tiers of development. Often framed in terms of whether people are able to “be” and “do” desirable things in life, HDI was developed by Pakistani economist Mahbub ul Haq and is backed by the United Nations. The higher the number, the more “developed” the country.
+
+I like this summary of this metric tracking if people can "be" and "do" the things they want.
+
+#### Happy Planet Index
+
+> This uses global data on life expectancy, experienced well-being, and ecological footprint to calculate an index that ranks countries on how many long and happy lives they produce per unit of environmental input. The higher the number, the happier the population.
+
+#### Gini Coefficient
+
+> One of the biggest issues with GDP is that it ignores inequality. The Gini coefficient, invented in 1912 by Italian statistician Corrado Gini, represents the income distribution of a nation’s residents. A low number represents low inequality, while a high one indicates a major gap between the rich and poor.
+
+And from the [CIA Factbook](https://www.cia.gov/library/publications/the-world-factbook/rankorder/2172rank.html): 
+
+> Gini index measures the degree of inequality in the distribution of family income in a country. The more nearly equal a country's income distribution, the lower its Gini index, e.g., a Scandinavian country with an index of 25. The more unequal a country's income distribution, the higher its Gini index, e.g., a Sub-Saharan country with an index of 50. If income were distributed with perfect equality the index would be zero; if income were distributed with perfect inequality, the index would be 100.
+
+#### Gross National Income (GNI)
+
+This one is **not** in our dataset, but does sound interesting from its description:
+
+> GNI measures the economic output of its citizens, taking into account the globalization of modern business. It’s calculated by adding up all the income of the residents of a country, including that received from abroad. As such, it helps show the economic strength of a country’s population, rather than the country itself. 
+
+
+#### Economic Freedom
+
+This one is not listed in the GDP alternatives site, but sounds like a very interesting measurement to look more closely at. 
+
+From the [index's site](https://www.heritage.org/index/about):
+
+> Economic freedom is the fundamental right of every human to control his or her own labor and property. In an economically free society, individuals are free to work, produce, consume, and invest in any way they please. In economically free societies, governments allow labor, capital, and goods to move freely, and refrain from coercion or constraint of liberty beyond the extent necessary to protect and maintain liberty itself.
+
+> Economic freedom brings greater prosperity. The Index of Economic Freedom documents the positive relationship between economic freedom and a variety of positive social and economic goals. The ideals of economic freedom are strongly associated with healthier societies, cleaner environments, greater per capita wealth, human development, democracy, and poverty elimination.
+
+This seems like it falls right in the wheelhouse of what a "good" government can provide!
+
+#### Sustainable Economic Development Assessment (SEDA)
+
+Also not in the GDP alternatives list. This is a new metric to measure well-being. 
+
+> SEDA is primarily an objective measure (combining data on outcomes, such as in health and education, with quasi-objective data, such as governance assessments). It is also a relative measure that assesses how a country performs in comparison to either the entire universe of countries or to individual peers or groups. 
+
+SEDA uses 10 dimensions, including wealth, quality of environment, and income equality to calculate a country's score. Sounds like quite a composite number!
+
+### Exploring Data
+
+Now we have a bit of backstory on the metrics, let's dig more into the data itself.
+
+First, I'll just rename some of the columns for easier access.
+
+```{r}
+gov_data$gdp_per_cap <- gov_data$`GDP per capita (PPP)`
+gov_data$hdi <- gov_data$`human development index`
+gov_data$seda <- gov_data$`sustainable economic development assessment (SEDA)`
+gov_data$gini <- gov_data$`GINI index`
+gov_data$efree <- gov_data$`overall economic freedom score` 
+```
+
+We can also calculate a few additional metrics using the data we have, that might be useful for showing patterns.
+
+```{r}
+# population density
+gov_data$pop_density <- gov_data$population / gov_data$`surface area (Km2)`
+
+# this is a suggested max population for 'small' countries
+small_country_max_pop = 5000000
+
+# we can use this threshold to create a new categorical column
+gov_data$country_size <- ifelse(gov_data$population > small_country_max_pop, 'big', 'little')
+
+gov_data$log_gdp <- log(gov_data$gdp_per_cap)
+```
+
+**HDI**
+
+I like to use [histograms](http://vallandingham.me/quickdraw_talk.html) to get a quick sense of what's in a dataset, and to uncover any mistakes with importing data into R. 
+
+So let's take a quick look at the Human Development Index (HDI) provided. We will use [ggplot]() to visualize. 
+
+```{r}
+gov_data %>%
+  ggplot(aes(x = hdi)) +
+  geom_histogram(binwidth = 0.05) +
+  labs(title = "Distribution of HDI")
+```
+
+A challenge with histograms is picking good bins... I've used a binwidth of `0.05` just because I know the HDI should range between 0 and 1, and I wanted to see generally where there are gaps and overlaps. 
+
+The warning also indicates that there are 9 countries with no HDI data. Not too many, given the dataset contains 195 countries. Still these might be good to filter out, if we pursue HDI further.
+
+**GDP**
+
+Next, let's take a quick look at GDP.
+
+```{r}
+gov_data %>%
+  ggplot(aes(x = gdp_per_cap)) +
+  geom_histogram(bins=30) +
+  labs(title = "Distribution of GDP")
+```
+
+Ah, we see a much different distribution here! This looks a bit exponential, which is not too surprising. Let's take a look at the countries with _really_ big GDP per capita
+
+```{r}
+gov_data %>% 
+  filter(gdp_per_cap > 50000) %>% 
+  arrange(-gdp_per_cap) %>% 
+  select(country, gdp_per_cap, country_size)
+```
+
+We can see that most of these are 'little' countries - with smaller populations. As noted, these countries can skew results (and they do - just check the histogram). They are candidates to filter out if we are more concerned with telling a 'big picture' story. 
+
+**HDI vs GDP**
+
+A scatterplot can show a relationship between two variables. Here, we can check the relationship between HDI and GDP.
+
+
+```{r}
+gov_data %>%
+  ggplot(aes(x = gdp_per_cap, y = hdi, colour = country_size)) +
+  geom_point(size=2) +
+  geom_text(check_overlap = TRUE, aes(label = country), colour = '#333333', alpha = 0.7) +
+  labs(title = "HDI vs GDP")
+```
+
+I've colored the points by country size, so we can see the impact of these little countries again. But there is definitely a relationship here, indicating that HDI impacts GDP or vice versa. 
+
+
+**Metric Correlations**
+
+What other relationships are there in this dataset? 
+
+Let's jam a bunch together into a facetted scatterplot! The built in `plot()` package will do this for us nicely. Below, I just filter a small subset of the data so that the relationships are still (somewhat) visable.
+
+```{r}
+gov_data %>% 
+  select(gdp_per_cap, gini, efree, `happy planet index`, hdi, seda, `unemployment (%)`) %>% 
+  plot()
+```
+
+So we can see some correlations visually from these plots, let's quantify this a bit more by plotting a correlation matrix. Using a [nice tutorial](http://www.sthda.com/english/wiki/correlation-matrix-a-quick-start-guide-to-analyze-format-and-visualize-a-correlation-matrix-using-r-software) as a guide, here I use the `cor()` function to calculate the correlation values between these variables, then plot using `corrplot`
+
+```{r}
+# If you don't have corrplot install with:
+# install.packages("corrplot")
+library(corrplot)
+```
+
+
+```{r}
+gov_data %>% 
+  select(gdp_per_cap, gini, efree, `happy planet index`, hdi, seda, `unemployment (%)`) %>% 
+  cor(use = "complete.obs") %>% 
+  corrplot(type = "upper", order = "hclust", tl.col = "black", tl.srt = 45)
+```
+
+It is not too surprising to see high correlation between SEDA, HDI, economic freedom, and GDP. 
+
+I am a bit surprised that the happy planet index is not as highly correlated with these measures as well - but perhaps that is because of the environment impact aspect of this metric. 
+
+It is also surprising that the Gini coefficient is not more negatively correlated with some of these other combo-metrics. SEDA takes inequality into account as part of its calculation so that explains why it is the most negatively correlated. 
+
+Not shown, but things don't change too much when 'little' countries are removed. Try it out yourself with an additional `filter()` in the code above.
+
+While there is some negative correlation between Gini and well-being metrics like SEDA and HDI, its still pretty messy. 
+
+Here is a plot showing HDI vs Gini, with sizes of dots indicating the GDP - as that was negatively correlated as well. 
+
+```{r}
+gov_data %>%  #filter(country_size == 'big') %>% 
+  ggplot(aes(x = gini, y=hdi, color = country_size, size = gdp_per_cap)) +
+  geom_point() +
+  geom_text(check_overlap = TRUE, aes(label = country), color = "#333333", size = 3) + 
+  labs(title = "HDI vs GINI")
+```
+
+We can see that roughly an increase in the Gini coefficient (meaning an increase in inequality) results in a decrease in the SEDA metric for well-being. This is true for GDP per capita as well. But the correlation is weak. 
+
+As an aside, we can see that we are also missing a lot of Gini scores for countries - given the warning messages.
+
+Could still contribute to an interesting story!
+
+**Linear Regression**
+
+As a quick look at how these variables relate, let's build a linear model that tries to predict GDP per capita from a combination of the Human Development Index, the Gini coefficient, and the Economic Freedom score. We will avoid SEDA for now, as it explicitly uses GDP-like inputs as part of its calculation. 
+
+```{r}
+lm_out <- lm(formula = log_gdp ~  hdi + efree + gini, data = gov_data)
+summary(lm_out)
+```
+
+So, roughly speaking, These inputs capture ~80% of the variability in the log-transformed GDP (we use the log of GDP to make that exponential relationship we saw before linear).
+
+
+### Adding Historic Data
+

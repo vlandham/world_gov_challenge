@@ -220,7 +220,7 @@ class ScatterPlot extends PureComponent {
     radius: 4,
     xLabel: "",
     yLabel: "",
-    zoomable: true,
+    zoomable: false,
     exactMouse: false
   };
 
@@ -400,9 +400,7 @@ class ScatterPlot extends PureComponent {
         });
     }
 
-    if (zoomable) {
-      this.setupZoom(this.underlay);
-    }
+    this.setupZoom(this.underlay);
 
     this.chart = this.g.append("g").classed("chart-group", true);
     this.tooltip = floatingTooltip("_tooltip");
@@ -433,14 +431,17 @@ class ScatterPlot extends PureComponent {
    *
    */
   setupZoom(underlay) {
+    const { zoomable } = this.props;
     this.zoomTransform = d3.zoomIdentity;
 
-    this.zoom = d3
-      .zoom()
-      .scaleExtent([1 / 4, 8])
-      .on("zoom", this.handleZoom);
+    if (zoomable) {
+      this.zoom = d3
+        .zoom()
+        .scaleExtent([1 / 4, 8])
+        .on("zoom", this.handleZoom);
 
-    underlay.call(this.zoom);
+      underlay.call(this.zoom);
+    }
   }
 
   /**

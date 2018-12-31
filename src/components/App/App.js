@@ -9,6 +9,7 @@ import { formatNumber } from "../../utils/format";
 import SmallMultipleConnected from "../SmallMultipleConnected/SmallMultipleConnected";
 
 import "./App.scss";
+import ConfigurePanel from "../ConfigurePanel/ConfigurePanel";
 
 function getData() {
   const changesPath = `${process.env.PUBLIC_URL}/data/gov_data_year.csv`;
@@ -17,6 +18,16 @@ function getData() {
 
 const STRING_COLUMNS = ["country", "iso3c", "iso2c"];
 const NULL_STRING = "NA";
+
+function normalizeMinMax(data, attr, normAttr) {
+  const minData = d3.min(data, d => d[attr]);
+  const maxData = d3.max(data, d => d[attr]);
+  data.forEach(datum => {
+    datum[normAttr] = (datum[attr] - minData) / (maxData - minData);
+  });
+
+  return data;
+}
 
 /**
  *
@@ -32,6 +43,23 @@ function processData(data) {
 
     datum.key = `${datum.country}:${datum.year}`;
   });
+
+  normalizeMinMax(data, "hdi", "hdi_norm");
+  normalizeMinMax(data, "gni_per_cap", "gni_norm");
+  normalizeMinMax(data, "efree", "efree_norm");
+
+  // nest by country to get normalized by country
+  const dataByCountry = d3
+    .nest()
+    .key(d => d.country)
+    .entries(data);
+
+  dataByCountry.forEach(country => {
+    normalizeMinMax(country.values, "hdi", "hdi_norm_local");
+    normalizeMinMax(country.values, "gni_per_cap", "gni_norm_local");
+    normalizeMinMax(country.values, "efree", "efree_norm_local");
+  });
+
   return data;
 }
 
@@ -51,6 +79,10 @@ class App extends Component {
     this.handleScatterHover = this.handleScatterHover.bind(this);
   }
 
+  /**
+   *
+   * @param {*} hoverData
+   */
   handleScatterHover(hoverData) {
     const { scatterHover } = this.state;
 
@@ -84,7 +116,7 @@ class App extends Component {
     const xFunc = d => d.gni_per_cap;
     const yFunc = d => d.hdi;
 
-    const xLabel = "GNI per capita";
+    const xLabel = "GNI per Capita";
     const yLabel = "Human Development Index";
 
     const tooltipTextFunc = d => {
@@ -213,10 +245,9 @@ class App extends Component {
             </Col>
           </Row>
           <Row>
-            <Col sm={2} />
-            <Col sm={9}>
+            <Col sm={12}>
               <div className="line" />
-              <p>Here is some data.</p>
+              <ConfigurePanel />
             </Col>
           </Row>
           <Row>

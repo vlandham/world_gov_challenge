@@ -8,7 +8,7 @@ function chartProps(props) {
   const { domain } = props;
   const years = d3.range(domain[0], domain[1] + 1, 1);
   const radius = 8;
-  const spacer = 8;
+  const spacer = 10;
   const dotWidth = (radius * 2 + spacer) * years.length;
   const xScale = d3
     .scalePoint()
@@ -29,7 +29,7 @@ class ColorLegend extends Component {
         <text className="title" textAnchor="middle">
           {year}
         </text>
-        <circle cx={0} cy={10} r={radius} fill={colorScale(year)} />
+        <circle cx={0} cy={13} r={radius} fill={colorScale(year)} />
       </g>
     );
   }

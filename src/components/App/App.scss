@@ -1,7 +1,18 @@
 .App {
-  padding-top: 20px;
   color: #5d6167;
   font-family: "Montserrat", sans-serif;
+  .top-bar {
+    width: 100%;
+    background-color: #00c6f3;
+    height: 40px;
+    padding-top: 7px;
+    margin-bottom: 20px;
+    a {
+      padding-right: 15px;
+      color: white;
+      text-decoration: none;
+    }
+  }
   .small-blue-title {
     color: #00c6f3;
     text-transform: uppercase;

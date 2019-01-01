@@ -83,6 +83,10 @@ function processData(data) {
   return data;
 }
 
+/**
+ *
+ * @param {*} data
+ */
 function groupData(data) {
   let dataGrouped = d3
     .nest()
@@ -91,6 +95,10 @@ function groupData(data) {
   return dataGrouped;
 }
 
+/**
+ *
+ * @param {*} data
+ */
 function processGroupedData(data) {
   data.forEach(country => {
     country.region = country.values[0].region;
@@ -176,9 +184,9 @@ class App extends Component {
     const { data, focusYear, scatterHover } = this.state;
     const displayData = data.filter(d => d.year === focusYear);
     const yFunc = d => d.hdi;
-    const xFunc = d => d.gni_per_cap;
+    const xFunc = d => d.gdp_per_cap;
 
-    const xLabel = "GNI per Capita";
+    const xLabel = "GDP per Capita";
     const yLabel = "Human Development Index";
 
     const tooltipTextFunc = d => {
@@ -211,10 +219,10 @@ class App extends Component {
   renderScatterGNIvsEfree() {
     const { data, focusYear, scatterHover } = this.state;
     const displayData = data.filter(d => d.year === focusYear);
-    const xFunc = d => d.gni_per_cap;
+    const xFunc = d => d.gdp_per_cap;
     const yFunc = d => d.efree;
 
-    const xLabel = "GNI per capita";
+    const xLabel = "GDP per capita";
     const yLabel = "Economic Freedom Score";
 
     const tooltipTextFunc = d => {
@@ -286,7 +294,20 @@ class App extends Component {
         <Container>
           <Row>
             <Col>
-              <p className="small-blue-title">Visualization</p>
+              <div className="top-bar">
+                <a
+                  className="align-middle float-right"
+                  href="http://vallandingham.me/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  vallandingham.me
+                </a>
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
               <h1>Good Government</h1>
             </Col>
           </Row>

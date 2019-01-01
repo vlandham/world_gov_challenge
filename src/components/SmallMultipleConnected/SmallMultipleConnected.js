@@ -89,7 +89,6 @@ function chartProps(props) {
     });
   };
 
-  console.log(dataGrouped);
   return {
     dataGrouped,
     xLabel,

@@ -57,7 +57,13 @@ function chartProps(props) {
   const line = d3
     .line()
     .x(xValue)
-    .y(yValue);
+    .y(yValue)
+    .curve(d3.curveCardinal.tension(0.3));
+  const lineCanvas = d3
+    .line()
+    .x(xValue)
+    .y(yValue)
+    .curve(d3.curveCardinal.tension(0.3));
 
   let colorValue = d => "#ddd";
   if (colorScale) {
@@ -83,6 +89,7 @@ function chartProps(props) {
   return {
     dataFiltered,
     line,
+    lineCanvas,
     padding,
     plotHeight,
     plotWidth,
@@ -435,27 +442,22 @@ class ConnectedScatterPlot extends PureComponent {
   updateCanvas() {
     const {
       dataBackground,
-      xValue,
-      yValue,
       sizeScale,
       width,
       height,
       padding,
       lineWidth,
-      scale
+      scale,
+      lineCanvas
     } = this.props;
 
-    const color = d3.color("#ddd");
-    color.opacity = scale === "global" ? 0.6 : 0.15;
+    const color = d3.color("#ccc");
+    color.opacity = scale === "global" ? 0.7 : 0.15;
 
     // get context
     const ctx = this.canvas.getContext("2d");
 
-    const lineCanvas = d3
-      .line()
-      .x(xValue)
-      .y(yValue)
-      .context(ctx);
+    lineCanvas.context(ctx);
 
     // Reset transform to ensure scale setting is appropriate.
     ctx.setTransform(1, 0, 0, 1, 0, 0);

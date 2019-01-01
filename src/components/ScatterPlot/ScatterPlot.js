@@ -32,15 +32,17 @@ function chartProps(props) {
   const plotHeight = height - padding.top - padding.bottom;
 
   const xExtent = d3.extent(data, xFunc);
+  const xPad = Math.round((xExtent[1] - xExtent[0]) / 20);
   const xScale = d3
     .scaleLinear()
-    .domain(xExtent)
+    .domain([xExtent[0] - xPad, xExtent[1] + xPad])
     .range([0, plotWidth]);
 
   const yExtent = d3.extent(data, yFunc);
+  const yPad = (yExtent[1] - yExtent[0]) / 20;
   const yScale = d3
     .scaleLinear()
-    .domain(yExtent)
+    .domain([yExtent[0] - yPad, yExtent[1] + yPad])
     .range([plotHeight, 0]);
 
   const xValue = d => xScale(xFunc(d));
@@ -48,8 +50,14 @@ function chartProps(props) {
   const colorValue = d =>
     colorByFunc(d) ? colorScale(colorByFunc(d)) : "#888";
 
-  const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
-  const xAxis = d3.axisBottom(xScale).tickSizeOuter(0);
+  const yAxis = d3
+    .axisLeft(yScale)
+    .tickSizeOuter(0)
+    .ticks(4);
+  const xAxis = d3
+    .axisBottom(xScale)
+    .tickSizeOuter(0)
+    .ticks(4);
 
   let voronoiDiagram = d3.voronoi()([]);
 

@@ -377,7 +377,7 @@ class ScatterPlot extends PureComponent {
    *
    */
   setup() {
-    const { zoomable, plotHeight, plotWidth, radius, exactMouse } = this.props;
+    const { plotHeight, plotWidth, radius, exactMouse } = this.props;
     const cRoot = d3.select(this.root);
 
     this.g = cRoot.append("g");

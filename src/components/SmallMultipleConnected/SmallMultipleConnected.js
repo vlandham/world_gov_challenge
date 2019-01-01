@@ -22,9 +22,15 @@ import { METRICS } from "../../constants";
  * @param {*} zFunc
  */
 function sortData(data, sortOrder, xFunc, yFunc, zFunc) {
-  if (sortOrder === "gdp") {
+  if (METRICS[sortOrder]) {
+    data = data.sort((x, y) =>
+      d3.descending(
+        x[METRICS[sortOrder].sortable],
+        y[METRICS[sortOrder].sortable]
+      )
+    );
   } else {
-    data.sort();
+    data = data.sort((x, y) => d3.ascending(x.key, y.key));
   }
 
   return data;
@@ -72,10 +78,6 @@ function chartProps(props) {
   //   .scaleSequential(d3.interpolatePlasma)
   //   .domain([2020, 1995]);
 
-  var colorScale = d3
-    .scaleSequential(d3.interpolateOranges)
-    .domain([1990, 2020]);
-
   const tooltipTextFunc = d => {
     const tooltipData = {
       [xLabel]: d[METRICS[xMetric].display],
@@ -96,7 +98,6 @@ function chartProps(props) {
     xFunc,
     yFunc,
     zFunc,
-    colorScale,
     tooltipTextFunc
   };
 }
@@ -110,14 +111,16 @@ class SmallMultipleScatter extends Component {
   static propTypes = {
     dataGrouped: PropTypes.array,
     scale: PropTypes.string,
-    sortOrder: PropTypes.string
+    sortOrder: PropTypes.string,
+    colorScale: PropTypes.func
   };
 
   static defaultProps = {
     dataGrouped: [],
     xMetric: "hdi",
     yMetric: "gni",
-    scale: "global"
+    scale: "global",
+    colorScale: d => "#333"
   };
 
   renderChart(chartData) {

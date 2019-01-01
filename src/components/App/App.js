@@ -9,6 +9,8 @@ import { formatNumber, roundNumber } from "../../utils/format";
 import { METRICS } from "../../constants";
 import SmallMultipleConnected from "../SmallMultipleConnected/SmallMultipleConnected";
 import ConfigurePanel from "../ConfigurePanel/ConfigurePanel";
+import ColorLegend from "../ColorLegend/ColorLegend";
+
 import "./App.scss";
 
 function getData() {
@@ -18,7 +20,7 @@ function getData() {
 
 const STRING_COLUMNS = ["country", "iso3c", "iso2c", "region", "sub-region"];
 const ROUND_COLUMNS = {
-  gdp_per_cap: 3
+  gdp_per_cap: { decimals: 0 }
 };
 const NULL_STRING = "NA";
 
@@ -46,7 +48,7 @@ function processData(data) {
       }
       if (ROUND_COLUMNS[key]) {
         datum[key] = datum[key]
-          ? roundNumber(datum[key], ROUND_COLUMNS[key])
+          ? roundNumber(datum[key], ROUND_COLUMNS[key].decimals)
           : null;
       }
     });
@@ -62,6 +64,7 @@ function processData(data) {
   normalizeMinMax(data, "gni_per_cap", "gni_norm");
   normalizeMinMax(data, "efree", "efree_norm");
   normalizeMinMax(data, "gdp_per_cap", "gdp_norm");
+  normalizeMinMax(data, "gini", "gini_norm");
 
   // nest by country to get normalized by country
   const dataByCountry = d3
@@ -74,6 +77,7 @@ function processData(data) {
     normalizeMinMax(country.values, "gni_per_cap", "gni_norm_local");
     normalizeMinMax(country.values, "hdi", "hdi_norm_local");
     normalizeMinMax(country.values, "efree", "efree_norm_local");
+    normalizeMinMax(country.values, "gini", "gini_norm_local");
   });
 
   return data;
@@ -90,7 +94,18 @@ function groupData(data) {
 function processGroupedData(data) {
   data.forEach(country => {
     country.region = country.values[0].region;
-    country.gdp_max = d3.max(country.values, d => d[METRICS["gdp"]["display"]]);
+    country[METRICS["gdp"].sortable] = d3.max(
+      country.values,
+      d => d[METRICS["gdp"]["display"]]
+    );
+    country[METRICS["hdi"].sortable] = d3.max(
+      country.values,
+      d => d[METRICS["hdi"]["display"]]
+    );
+    country[METRICS["efree"].sortable] = d3.max(
+      country.values,
+      d => d[METRICS["efree"]["display"]]
+    );
   });
   return data;
 }
@@ -104,13 +119,15 @@ class App extends Component {
 
     this.state = {
       data: [],
+      dataGrouped: [],
       focusYear: 2017,
       scatterHover: null,
       configs: {
         dataDisplay: "hdi_gdp",
-        sortOrder: "alpha",
+        sortOrder: "gdp",
         scale: "local"
-      }
+      },
+      colorScale: d3.scaleSequential(d3.interpolateOranges).domain([1990, 2020])
     };
 
     this.handleScatterHover = this.handleScatterHover.bind(this);
@@ -228,7 +245,7 @@ class App extends Component {
    *
    */
   renderSmallMult() {
-    const { dataGrouped, configs } = this.state;
+    const { dataGrouped, configs, colorScale } = this.state;
 
     const [yMetric, xMetric] = configs.dataDisplay.split("_");
 
@@ -238,6 +255,8 @@ class App extends Component {
         xMetric={xMetric}
         yMetric={yMetric}
         scale={configs.scale}
+        sortOrder={configs.sortOrder}
+        colorScale={colorScale}
       />
     );
   }
@@ -252,7 +271,16 @@ class App extends Component {
   /**
    *
    */
+  renderLegend() {
+    const { colorScale } = this.state;
+    return <ColorLegend colorScale={colorScale} domain={[2010, 2017]} />;
+  }
+
+  /**
+   *
+   */
   render() {
+    const { dataGrouped } = this.state;
     return (
       <div className="App">
         <Container>
@@ -313,6 +341,15 @@ class App extends Component {
               <div className="line" />
               {this.renderConfigPanel()}
             </Col>
+          </Row>
+          <Row>
+            <Col sm={5}>
+              <span className="align-middle">
+                Showing data from 2010 to 2017 for {dataGrouped.length}{" "}
+                countries.
+              </span>
+            </Col>
+            <Col sm={6}>{this.renderLegend()}</Col>
           </Row>
           <Row>
             <Col sm={12}>{this.renderSmallMult()}</Col>

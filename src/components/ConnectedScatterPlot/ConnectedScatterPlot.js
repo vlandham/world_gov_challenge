@@ -7,6 +7,10 @@ import { floatingTooltip } from "../tooltip/tooltip";
 
 import "./ConnectedScatterPlot.scss";
 
+/**
+ *
+ * @param {*} props
+ */
 function chartProps(props) {
   const { data, xFunc, yFunc, zFunc, colorScale, height, width, scale } = props;
 
@@ -547,5 +551,13 @@ class ConnectedScatterPlot extends PureComponent {
 }
 
 export default addComputedProps(chartProps, {
-  changeInclude: ["data", "width", "height", "xMetric", "yMetric"]
+  changeInclude: [
+    "dataGrouped",
+    "scale",
+    "sortOrder",
+    "width",
+    "height",
+    "xMetric",
+    "yMetric"
+  ]
 })(ConnectedScatterPlot);

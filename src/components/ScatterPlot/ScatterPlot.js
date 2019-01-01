@@ -118,6 +118,7 @@ class ScatterPlot extends PureComponent {
      * xFunc, yFunc, and colorByFunc, respectively.
      */
     data: PropTypes.array,
+    labels: PropTypes.object,
 
     /**
      * A nice UX feature is when mousing over a plot,
@@ -214,6 +215,7 @@ class ScatterPlot extends PureComponent {
 
   static defaultProps = {
     data: [],
+    labels: {},
     name: "scatter",
     brushable: true,
     colorByFunc: () => {},
@@ -332,6 +334,7 @@ class ScatterPlot extends PureComponent {
     if (!d) {
       this.highlight.style("display", "none");
       this.tooltip.hideTooltip();
+      this.annotation.attr("opacity", 1.0);
     } else {
       this.highlight
         .style("display", "")
@@ -341,6 +344,7 @@ class ScatterPlot extends PureComponent {
       if (tooltipTextFunc) {
         this.tooltip.showTooltip(tooltipTextFunc(d), d3.event);
       }
+      this.annotation.attr("opacity", 0.3);
     }
 
     if (onHover) {
@@ -420,6 +424,11 @@ class ScatterPlot extends PureComponent {
       .style("fill", "none")
       .style("display", "none");
 
+    this.annotation = this.g
+      .append("g")
+      .classed("annotation", true)
+      .attr("pointer-events", "none");
+
     this.xAxis = this.g.append("g").classed("x-axis", true);
     this.yAxis = this.g.append("g").classed("y-axis", true);
     this.yAxisLabel = this.g
@@ -460,7 +469,41 @@ class ScatterPlot extends PureComponent {
     this.g.attr("transform", `translate(${padding.left} ${padding.top})`);
 
     this.updateChart();
+    this.updateAnnotation();
     this.updateAxes();
+  }
+
+  updateAnnotation() {
+    const { data, labels, xFunc, yFunc } = this.props;
+    let { xScale, yScale } = this.props;
+
+    const labelData = data.filter(d => labels[d.country]);
+
+    xScale = this.zoomTransform.rescaleX(xScale);
+    yScale = this.zoomTransform.rescaleY(yScale);
+
+    const xValue = d => xScale(xFunc(d));
+    const yValue = d => yScale(yFunc(d));
+
+    const binding = this.annotation
+      .selectAll(".label")
+      .data(labelData, d => d.country);
+
+    const enter = binding
+      .enter()
+      .append("text")
+      .classed("label", true);
+    const merged = enter.merge(binding);
+
+    merged
+      .attr("x", xValue)
+      .attr("y", d => yValue(d))
+      .attr("dy", d => (labels[d.country].position === "below" ? 15 : 3))
+      .attr("dx", d => (labels[d.country].position === "below" ? null : 8))
+      .attr("text-anchor", d =>
+        labels[d.country].position === "below" ? "middle" : "start"
+      )
+      .text(d => d.country);
   }
 
   /**

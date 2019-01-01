@@ -1,5 +1,11 @@
 @import "../../styles/colors.scss";
 .ScatterPlot {
+  .annotation {
+    pointer-events: none;
+  }
+  .label {
+    font-size: 10px;
+  }
   .highlight-circle {
     pointer-events: none;
   }

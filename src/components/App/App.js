@@ -6,13 +6,16 @@ import AutoWidth from "../AutoWidth/AutoWidth";
 import ScatterPlot from "../ScatterPlot/ScatterPlot";
 import { tableContent } from "../tooltip/tooltip";
 import { formatNumber, roundNumber } from "../../utils/format";
-import { METRICS } from "../../constants";
+import { METRICS, SCATTER_LABELS } from "../../constants";
 import SmallMultipleConnected from "../SmallMultipleConnected/SmallMultipleConnected";
 import ConfigurePanel from "../ConfigurePanel/ConfigurePanel";
 import ColorLegend from "../ColorLegend/ColorLegend";
 
 import "./App.scss";
 
+/**
+ *
+ */
 function getData() {
   const changesPath = `${process.env.PUBLIC_URL}/data/gov_data_year.csv`;
   return d3.csv(changesPath);
@@ -24,6 +27,9 @@ const ROUND_COLUMNS = {
 };
 const NULL_STRING = "NA";
 
+/**
+ *
+ */
 function normalizeMinMax(data, attr, normAttr) {
   const minData = d3.min(data, d => d[attr]);
   const maxData = d3.max(data, d => d[attr]);
@@ -208,6 +214,7 @@ class App extends Component {
           hoverData={scatterHover}
           tooltipTextFunc={tooltipTextFunc}
           onHover={this.handleScatterHover}
+          labels={SCATTER_LABELS.hdi}
         />
       </AutoWidth>
     );
@@ -222,7 +229,7 @@ class App extends Component {
     const xFunc = d => d.gdp_per_cap;
     const yFunc = d => d.efree;
 
-    const xLabel = "GDP per capita";
+    const xLabel = "GDP per Capita";
     const yLabel = "Economic Freedom Score";
 
     const tooltipTextFunc = d => {
@@ -244,6 +251,7 @@ class App extends Component {
           hoverData={scatterHover}
           tooltipTextFunc={tooltipTextFunc}
           onHover={this.handleScatterHover}
+          labels={SCATTER_LABELS.efree}
         />
       </AutoWidth>
     );

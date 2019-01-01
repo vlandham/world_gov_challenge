@@ -53,3 +53,23 @@ export const CONFIGS = {
     ]
   }
 };
+
+export const SCATTER_LABELS = {
+  hdi: {
+    "United States": { id: "United States", position: "below" },
+    Singapore: { id: "Singapore", position: "below" },
+    Italy: { id: "Italy", position: "below" },
+    Iraq: { id: "Italy", position: "below" },
+    Sudan: { id: "Italy", position: "right" },
+    Chad: { id: "Italy", position: "right" }
+  },
+  efree: {
+    "United States": { id: "United States", position: "below" },
+    Singapore: { id: "Singapore", position: "below" },
+    Italy: { id: "Italy", position: "below" },
+    Iraq: { id: "Iraq", position: "below" },
+    Algeria: { id: "Algeria", position: "below" },
+    Chile: { id: "Chile", position: "below" },
+    Switzerland: { id: "Switzerland", position: "below" }
+  }
+};

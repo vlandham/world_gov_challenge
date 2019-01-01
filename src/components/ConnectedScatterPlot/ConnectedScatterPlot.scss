@@ -1,1 +1,10 @@
-.ConnectedScatterPlot {}
+.ConnectedScatterPlot {
+  .chart-container {
+    position: relative;
+  }
+  .chart {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}

@@ -6,10 +6,10 @@ import AutoWidth from "../AutoWidth/AutoWidth";
 import ScatterPlot from "../ScatterPlot/ScatterPlot";
 import { tableContent } from "../tooltip/tooltip";
 import { formatNumber, roundNumber } from "../../utils/format";
+import { METRICS } from "../../constants";
 import SmallMultipleConnected from "../SmallMultipleConnected/SmallMultipleConnected";
-
-import "./App.scss";
 import ConfigurePanel from "../ConfigurePanel/ConfigurePanel";
+import "./App.scss";
 
 function getData() {
   const changesPath = `${process.env.PUBLIC_URL}/data/gov_data_year.csv`;
@@ -79,6 +79,22 @@ function processData(data) {
   return data;
 }
 
+function groupData(data) {
+  let dataGrouped = d3
+    .nest()
+    .key(d => d.country)
+    .entries(data);
+  return dataGrouped;
+}
+
+function processGroupedData(data) {
+  data.forEach(country => {
+    country.region = country.values[0].region;
+    country.gdp_max = d3.max(country.values, d => d[METRICS["gdp"]["display"]]);
+  });
+  return data;
+}
+
 /**
  *
  */
@@ -130,8 +146,9 @@ class App extends Component {
     getData()
       .then(processData)
       .then(data => {
-        console.log(data);
-        this.setState({ data });
+        let dataGrouped = groupData(data);
+        dataGrouped = processGroupedData(dataGrouped);
+        this.setState({ data, dataGrouped });
       });
   }
 
@@ -211,13 +228,13 @@ class App extends Component {
    *
    */
   renderSmallMult() {
-    const { data, configs } = this.state;
+    const { dataGrouped, configs } = this.state;
 
     const [yMetric, xMetric] = configs.dataDisplay.split("_");
 
     return (
       <SmallMultipleConnected
-        data={data}
+        dataGrouped={dataGrouped}
         xMetric={xMetric}
         yMetric={yMetric}
         scale={configs.scale}

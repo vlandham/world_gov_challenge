@@ -13,10 +13,30 @@ import AutoWidth from "../AutoWidth/AutoWidth";
 
 import { METRICS } from "../../constants";
 
+/**
+ *
+ * @param {*} data
+ * @param {*} sortOrder
+ * @param {*} xFunc
+ * @param {*} yFunc
+ * @param {*} zFunc
+ */
 function sortData(data, sortOrder, xFunc, yFunc, zFunc) {
+  if (sortOrder === "gdp") {
+  } else {
+    data.sort();
+  }
+
   return data;
 }
 
+/**
+ *
+ * @param {*} data
+ * @param {*} threshold
+ * @param {*} xFunc
+ * @param {*} yFunc
+ */
 function filterData(data, threshold, xFunc, yFunc) {
   return data.filter(country => {
     const validYears = country.values.filter(year => {
@@ -33,10 +53,7 @@ function filterData(data, threshold, xFunc, yFunc) {
  */
 function chartProps(props) {
   const { xMetric, yMetric, scale, sortOrder } = props;
-  let dataGrouped = d3
-    .nest()
-    .key(d => d.country)
-    .entries(props.data);
+  let { dataGrouped } = props;
 
   const zMetric = "year";
   const xLabel = METRICS[xMetric].label;
@@ -91,13 +108,13 @@ const EXTENT = [-0.1, 1.1];
  */
 class SmallMultipleScatter extends Component {
   static propTypes = {
-    data: PropTypes.array,
+    dataGrouped: PropTypes.array,
     scale: PropTypes.string,
     sortOrder: PropTypes.string
   };
 
   static defaultProps = {
-    data: [],
+    dataGrouped: [],
     xMetric: "hdi",
     yMetric: "gni",
     scale: "global"
@@ -115,7 +132,8 @@ class SmallMultipleScatter extends Component {
       xMetric,
       yMetric,
       scale,
-      colorScale
+      colorScale,
+      dataGrouped
     } = this.props;
     return (
       <div key={chartData.key} className="small-multiple">
@@ -137,6 +155,7 @@ class SmallMultipleScatter extends Component {
             xMetric={xMetric}
             yMetric={yMetric}
             scale={scale}
+            dataBackground={dataGrouped}
           />
         </AutoWidth>
       </div>

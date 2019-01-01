@@ -19,6 +19,12 @@ function chartProps(props) {
     left: 40
   };
 
+  // scaling for retina displays
+  let sizeScale = 1.0;
+  if (window.devicePixelRatio) {
+    sizeScale = window.devicePixelRatio;
+  }
+
   const radius = scale === "local" ? 5 : 2;
   const lineWidth = scale === "local" ? 3 : 1;
 
@@ -86,7 +92,8 @@ function chartProps(props) {
     voronoiDiagram,
     mouseRadius,
     xAxis,
-    yAxis
+    yAxis,
+    sizeScale
   };
 }
 
@@ -212,8 +219,6 @@ class ConnectedScatterPlot extends PureComponent {
 
     const cRoot = d3.select(this.root);
 
-    // var defs = cRoot.append("defs");
-
     this.g = cRoot.append("g");
 
     const that = this;
@@ -223,6 +228,7 @@ class ConnectedScatterPlot extends PureComponent {
       .attr("width", plotWidth)
       .attr("height", plotHeight)
       .style("fill", "white")
+      .style("opacity", 0.001)
       .on("mousemove", function(d) {
         that.handleMouseover(this, d);
       })
@@ -279,8 +285,8 @@ class ConnectedScatterPlot extends PureComponent {
     this.g.attr("transform", `translate(${padding.left} ${padding.top})`);
 
     this.updateChart();
-    // this.updateAxesold();
     this.updateAxes();
+    this.updateCanvas();
   }
 
   /**
@@ -303,6 +309,7 @@ class ConnectedScatterPlot extends PureComponent {
       .attr("stroke-width", lineWidth)
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
+      .attr("pointer-events", "none")
       .attr("d", line);
 
     lineBinding.exit().remove();
@@ -419,9 +426,53 @@ class ConnectedScatterPlot extends PureComponent {
   }
 
   /**
+   * Rerenders the chart on the canvas. Recomputes data sorting and scales.
+   */
+  updateCanvas() {
+    const {
+      dataBackground,
+      xValue,
+      yValue,
+      sizeScale,
+      width,
+      height,
+      padding,
+      lineWidth,
+      scale
+    } = this.props;
+
+    const color = d3.color("#ddd");
+    color.opacity = scale === "global" ? 0.6 : 0.15;
+
+    // get context
+    const ctx = this.canvas.getContext("2d");
+
+    const lineCanvas = d3
+      .line()
+      .x(xValue)
+      .y(yValue)
+      .context(ctx);
+
+    // Reset transform to ensure scale setting is appropriate.
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(sizeScale, sizeScale);
+    // draw main bars
+    ctx.clearRect(0, 0, width, height);
+    // have some padding
+    ctx.translate(padding.left, padding.top);
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = color.toString();
+    dataBackground.forEach((country, index) => {
+      ctx.beginPath();
+      lineCanvas(country.values);
+      ctx.stroke();
+    });
+  }
+
+  /**
    *
    */
-  updateAxesold() {
+  updateAxesExact() {
     const {
       xAxis,
       yAxis,
@@ -461,19 +512,35 @@ class ConnectedScatterPlot extends PureComponent {
    *
    */
   render() {
-    const { name, height, width } = this.props;
+    const { name, height, width, sizeScale } = this.props;
+
+    let canvasStyle = {
+      width: width,
+      height: height
+    };
 
     return (
       <div className="ConnectedScatterPlot">
         <h4 className="title">{name}</h4>
-        <svg
-          className="chart"
-          ref={node => {
-            this.root = node;
-          }}
-          height={height}
-          width={width}
-        />
+        <div className="chart-container">
+          <canvas
+            className="chart-canvas"
+            ref={node => {
+              this.canvas = node;
+            }}
+            style={canvasStyle}
+            width={width * sizeScale}
+            height={height * sizeScale}
+          />
+          <svg
+            className="chart"
+            ref={node => {
+              this.root = node;
+            }}
+            height={height}
+            width={width}
+          />
+        </div>
       </div>
     );
   }

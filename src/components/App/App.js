@@ -424,6 +424,7 @@ class App extends Component {
                 for both the individuals being governed, and good in the amount
                 of wealth produced.
               </p>
+              <div className="blank" />
             </Col>
           </Row>
           <Row>
@@ -444,13 +445,25 @@ class App extends Component {
               <p>
                 The visualization below allows comparison and exploration of
                 these metrics through <strong>connected scatterplots</strong>{" "}
-                for each country. The graphs use the x and y dimensions to plot
-                different metric values, with each year of data displayed
-                connected together by a line. Data from all countries is
-                displayed in the background in grey for comparison. With this
-                visualization we can find connections between countries and
-                patterns within a country, both at a global scale, and also at a
-                country-level scale for seeing year-to-year changes up close.
+                for each country.
+              </p>
+              <p>
+                The graphs use the x and y dimensions to plot different metric
+                values, with each year of data displayed connected together by a
+                line. Data from all countries is displayed in the background in
+                grey for comparison. Display options allow us to find
+                connections between countries and patterns within a country,
+                both at a global scale, and also at a country-level scale for
+                seeing year-to-year changes up close. After exploring the
+                visualization,{" "}
+                <a
+                  href="http://vallandingham.me/world_gov_challenge/analysis.nb.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  check out the analysis behind it
+                </a>
+                .
               </p>
               <p>
                 With this visualization, we can see the progress of the
@@ -486,6 +499,10 @@ class App extends Component {
                 <a href="http://vallandingham.me">vallandingham.me</a> |{" "}
                 <a href="http://vallandingham.me/world_gov_challenge/analysis.nb.html">
                   Analysis
+                </a>{" "}
+                | Developed for the{" "}
+                <a href="https://wdvp.worldgovernmentsummit.org/">
+                  World Data Visualization Prize
                 </a>
               </p>
             </Col>

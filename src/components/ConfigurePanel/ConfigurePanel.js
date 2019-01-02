@@ -86,7 +86,7 @@ class ConfigurePanel extends Component {
   render() {
     return (
       <div className="ConfigurePanel">
-        Displaying {this.renderDropdown("dataDisplay")} sorted{" "}
+        Showing {this.renderDropdown("dataDisplay")} sorted{" "}
         {this.renderDropdown("sortOrder")} using a{" "}
         {this.renderDropdown("scale")} scale.
       </div>

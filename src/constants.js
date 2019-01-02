@@ -43,6 +43,7 @@ export const CONFIGS = {
       { label: "By GDP", id: "gdp" },
       { label: "By HDI", id: "hdi" },
       { label: "By Economic Freedom", id: "efree" },
+      { label: "By Region", id: "region" },
       { label: "Alphabetically", id: "alpha" }
     ]
   },

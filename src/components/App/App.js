@@ -107,7 +107,7 @@ function groupData(data) {
  */
 function processGroupedData(data) {
   data.forEach(country => {
-    country.region = country.values[0].region;
+    country.region = country.values[0].region || "Other";
     country[METRICS["gdp"].sortable] = d3.max(
       country.values,
       d => d[METRICS["gdp"]["display"]]
@@ -289,7 +289,7 @@ class App extends Component {
    */
   renderLegend() {
     const { colorScale } = this.state;
-    return <ColorLegend colorScale={colorScale} domain={[2010, 2017]} />;
+    return <ColorLegend colorScale={colorScale} domain={[2001, 2017]} />;
   }
 
   /**
@@ -316,7 +316,55 @@ class App extends Component {
           </Row>
           <Row>
             <Col>
-              <h1>Good Government</h1>
+              <h1>Good Governments Help People to Succeed</h1>
+              <h5 className="author">Jim Vallandingham</h5>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={2} />
+            <Col sm={9}>
+              <div className="blank" />
+              <p>
+                This visual exploration looks at answering the question of what
+                makes a good government from an individual's perspective.
+              </p>
+              <p>
+                When thinking of the attributes that make a government “good”,
+                it is easy to fall back on a commonly used measurement like the
+                Gross Domestic Product (GDP) that showcase a government’s power
+                and progress. The GDP measures the value of goods and services
+                produced in a period of time. It ranks countries, and their
+                governments, by output, with more output being associated with a
+                “better” government.
+              </p>
+
+              <p>
+                While the top economic progress is a tempting answer for what
+                makes a government successful, metrics like the GDP fail to
+                explain what makes a government good or bad for the individuals
+                living under that government. A high GDP doesn’t necessarily
+                mean a high quality of life. We, as governed people, need to
+                take a more nuanced look at the quality of government, through
+                the lense of social well-being and enablement of individual
+                progress.
+              </p>
+
+              <blockquote cite="Thomas Jefferson">
+                The care of human life and happiness, and not their destruction,
+                is the first and only object of good government.
+              </blockquote>
+
+              <p>
+                This true purpose of government, to improve human life, is
+                nothing new. Thomas Jefferson, the principal author of the
+                Declaration of Independence and the third president of the
+                United States said as much during his lifetime.
+              </p>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <h2>New Metrics to Understand Progress</h2>
             </Col>
           </Row>
           <Row>
@@ -324,29 +372,29 @@ class App extends Component {
             <Col sm={9}>
               <div className="line" />
               <p>
-                What makes a good government? Often when we think of successful
-                governments, we focus on the output of its people and its
-                mightiness when compared to its peers. But perhaps a more
-                important measure of a good government is its ability to provide
-                comfort and success to the individuals it governs.
+                From a data perspective, many organizations and researchers have
+                developed a variety of metrics that can be used to better
+                understand a government’s individual impact. We will focus on
+                just a few.
               </p>
-              <blockquote cite="Thomas Jefferson">
-                The care of human life and happiness, and not their destruction,
-                is the first and only object of good government.
-              </blockquote>
-              <p>Something Something Something.</p>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <h2>Quality of Life is Connected to Progress</h2>
-            </Col>
-          </Row>
-          <Row>
-            <Col sm={2} />
-            <Col sm={9}>
-              <div className="line" />
-              <p>But we don't have to have it only one way.</p>
+              <p>
+                The <strong>Human Development Index (HDI)</strong> combines
+                statistics on life expectancy, education, and income per capita
+                to rank countries into tiers of development. This index provides
+                a measure of how good a government is at enabling individuals to
+                do the things they want to do, and be the people they want to
+                be.
+              </p>
+              <p>
+                The <strong>Economic Freedom Score</strong>, calculated by the
+                Heritage Foundation, tracks how well a government enables an
+                individual the freedom to work, produce, consume, and invest in
+                any way they please.
+              </p>
+              <p>
+                The good news is that these metrics are correlated with more
+                performance metrics like GDP.
+              </p>
             </Col>
           </Row>
           <Row>
@@ -357,31 +405,76 @@ class App extends Component {
             <Col sm={2} />
             <Col sm={9}>
               <div className="blank" />
-              <p>But that is not the whole story.</p>
+              <p>
+                Governments <strong>can</strong> achieve success in being good
+                for both the individuals being governed, and good in the amount
+                of wealth produced.
+              </p>
             </Col>
           </Row>
           <Row>
             <Col>
-              <h2>Progress of Countries</h2>
+              <h2>Progress Over Time</h2>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={2} />
+            <Col sm={9}>
+              <div className="line" />
+              <p>
+                This simple snapshot of government performance on these metrics
+                is useful, but what is perhaps more interesting is a country’s
+                progress over time, and how values for an individual country
+                change year by year.
+              </p>
+              <p>
+                The visualization below allows comparison and exploration of
+                these metrics through <strong>connected scatterplots</strong>{" "}
+                for each country. The graphs use the x and y dimensions to plot
+                different metric values, with each year of data displayed
+                connected together by a line. Data from all countries is
+                displayed in the background in grey for comparison. With this
+                visualization we can find connections between countries and
+                patterns within a country, both at a global scale, and also at a
+                country-level scale for seeing year-to-year changes up close.
+              </p>
+              <p>
+                With this visualization, we can see the progress of the
+                governments of the world toward or away from what is good for
+                their peoples, as well as what is good for economic growth.
+              </p>
             </Col>
           </Row>
           <Row>
             <Col sm={12}>
-              <div className="line" />
-              {this.renderConfigPanel()}
+              <div className="blank" />
+              <h2>Connected Countries</h2>
             </Col>
           </Row>
           <Row>
-            <Col sm={5}>
+            <Col sm={12}>{this.renderConfigPanel()}</Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
               <span className="align-middle">
-                Showing data from 2010 to 2017 for {dataGrouped.length}{" "}
-                countries.
+                Data from 2000 to 2017 for {dataGrouped.length} countries.
               </span>
             </Col>
             <Col sm={6}>{this.renderLegend()}</Col>
           </Row>
           <Row>
             <Col sm={12}>{this.renderSmallMult()}</Col>
+          </Row>
+          <Row>
+            <Col sm={12} className="footer">
+              <p>
+                Jim Vallandingham |{" "}
+                <a href="http://vallandingham.me">vallandingham.me</a> |{" "}
+                <a href="http://vallandingham.me/world_gov_challenge/analysis.nb.html">
+                  Analysis
+                </a>
+              </p>
+            </Col>
           </Row>
         </Container>
       </div>

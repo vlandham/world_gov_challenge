@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import addComputedProps from "react-computed-props";
+import { Row, Col } from "reactstrap";
 import * as d3 from "d3";
 import ConnectedScatterPlot from "../ConnectedScatterPlot/ConnectedScatterPlot";
 import isfinite from "lodash.isfinite";
@@ -29,6 +30,8 @@ function sortData(data, sortOrder, xFunc, yFunc, zFunc) {
         y[METRICS[sortOrder].sortable]
       )
     );
+  } else if (sortOrder === "region") {
+    data = data.sort((x, y) => d3.ascending(x.region, y.region));
   } else {
     data = data.sort((x, y) => d3.ascending(x.key, y.key));
   }
@@ -101,12 +104,12 @@ function chartProps(props) {
   };
 }
 
-const EXTENT = [-0.1, 1.1];
+const EXTENT = [-0.05, 1.05];
 
 /**
  *
  */
-class SmallMultipleScatter extends Component {
+class SmallMultipleConnected extends Component {
   static propTypes = {
     dataGrouped: PropTypes.array,
     scale: PropTypes.string,
@@ -122,7 +125,7 @@ class SmallMultipleScatter extends Component {
     colorScale: d => "#333"
   };
 
-  renderChart(chartData) {
+  renderChart(chartData, chartIndex) {
     const {
       xFunc,
       yFunc,
@@ -138,7 +141,7 @@ class SmallMultipleScatter extends Component {
       dataGrouped
     } = this.props;
     return (
-      <div key={chartData.key} className="small-multiple">
+      <Col sm={4} key={chartData.key}>
         <AutoWidth>
           <ConnectedScatterPlot
             key={chartData.key}
@@ -160,8 +163,32 @@ class SmallMultipleScatter extends Component {
             dataBackground={dataGrouped}
           />
         </AutoWidth>
-      </div>
+      </Col>
     );
+  }
+
+  renderRegion(chartData, index) {
+    const { sortOrder, dataGrouped } = this.props;
+    const region = chartData.region;
+    if (sortOrder === "region") {
+      if (index === 0) {
+        return (
+          <Col sm={12} key={region}>
+            <h3 className="region">{region}</h3>
+          </Col>
+        );
+      } else {
+        const preRegion = dataGrouped[index - 1].region;
+        if (region !== preRegion) {
+          return (
+            <Col key={region} sm={12}>
+              <h3 className="region">{region}</h3>
+            </Col>
+          );
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -171,10 +198,15 @@ class SmallMultipleScatter extends Component {
     const { dataGrouped } = this.props;
     return (
       <div className="SmallMultipleConnected">
-        {dataGrouped.map(d => this.renderChart(d))}
+        <Row>
+          {dataGrouped.map((d, i) => [
+            this.renderRegion(d, i),
+            this.renderChart(d, i)
+          ])}
+        </Row>
       </div>
     );
   }
 }
 
-export default addComputedProps(chartProps)(SmallMultipleScatter);
+export default addComputedProps(chartProps)(SmallMultipleConnected);

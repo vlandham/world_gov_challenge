@@ -132,6 +132,7 @@ class ConnectedScatterPlot extends PureComponent {
     data: [],
     radius: 4,
     height: 300,
+    width: 300,
     name: "",
     xFunc: d => d.x,
     yFunc: d => d.x,

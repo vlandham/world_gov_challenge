@@ -13,6 +13,10 @@
       text-decoration: none;
     }
   }
+  h1,
+  .author {
+    text-align: center;
+  }
   .small-blue-title {
     color: #00c6f3;
     text-transform: uppercase;
@@ -36,5 +40,9 @@
   h4 {
     color: #111;
     font-weight: 700;
+  }
+  .footer {
+    margin-top: 30px;
+    padding-bottom: 20px;
   }
 }

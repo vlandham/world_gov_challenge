@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/world_gov_challenge/precache-manifest.a669b99f7294e6e5739ce09bf9729a17.js"
+  "/world_gov_challenge/precache-manifest.24def244dd38264558ddd0558f592c25.js"
 );
 
 workbox.clientsClaim();

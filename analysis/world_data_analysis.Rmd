@@ -182,7 +182,7 @@ gov_data$country_size <- ifelse(gov_data$population > small_country_max_pop, 'bi
 ```{r}
 gov_data$gdp <- gov_data$`GDP per capita (PPP)`
 gov_data$hdi <- gov_data$`human development index`
-gov_data$density <- gov_data$population / gov_data$`surface area (Km2)`
+gov_data$pop_density <- gov_data$population / gov_data$`surface area (Km2)`
 
 gov_data$seda <- gov_data$`sustainable economic development assessment (SEDA)`
 gov_data$gini <- gov_data$`GINI index`
@@ -386,7 +386,9 @@ It uses global data on life expectancy, experienced well-being, and ecological f
 
 Gini Coefficient
 
-One of the biggest issues with GDP is that it ignores inequality. The Gini coefficient, invented in 1912 by Italian statistician Corrado Gini, represents the income distribution of a nation’s residents. A low number represents low inequality, while a high one indicates a major gap between the rich and poor.
+> One of the biggest issues with GDP is that it ignores inequality. The Gini coefficient, invented in 1912 by Italian statistician Corrado Gini, represents the income distribution of a nation’s residents. A low number represents low inequality, while a high one indicates a major gap between the rich and poor.
+
+
 
 Gini index measures the degree of inequality in the distribution of family income in a country. The more nearly equal a country's income distribution, the lower its Gini index, e.g., a Scandinavian country with an index of 25. The more unequal a country's income distribution, the higher its Gini index, e.g., a Sub-Saharan country with an index of 50. If income were distributed with perfect equality the index would be zero; if income were distributed with perfect inequality, the index would be 100.
 
@@ -429,17 +431,28 @@ wb_data <- wb(country= "all", indicator = indicators, startdate = 2000, enddate 
 wb_data$year = as.numeric(wb_data$date)
 ```
 
+## Regions
 
-### Combo
+```{r}
+filename <- "data/country_regions.csv"
+regions_data <- read_csv(filename)
+```
+
+## Combo
 
 ```{r}
 ecfree_hdi_wb_data <- left_join(ecfree_hdi_data, wb_data, by = c("name" = "country", "index year" = "year") )
 ```
 
+```{r}
+ecfree_hdi_wb_data <- left_join(ecfree_hdi_wb_data, regions_data, by = c("iso3c" = "alpha-3"))
+```
+
+
 Filter small countries
 
 ```{r}
-ecfree_hdi_wb_data <- ecfree_hdi_wb_data %>% filter(SP.POP.TOTL > small_country_max_pop)
+#ecfree_hdi_wb_data <- ecfree_hdi_wb_data %>% filter(SP.POP.TOTL > small_country_max_pop)
 ```
 
 
@@ -451,7 +464,7 @@ range01 <- function(x){(x-min(x, na.rm = TRUE))/(max(x, na.rm = TRUE)-min(x, na.
 
 
 ```{r}
-ecfree_hdi_wb_data$country <- ecfree_hdi_wb_data$name
+ecfree_hdi_wb_data$country <- ecfree_hdi_wb_data$name.x
 ecfree_hdi_wb_data$year <- ecfree_hdi_wb_data$`index year`
 ecfree_hdi_wb_data$hdi <- ecfree_hdi_wb_data$hdi_value
 ecfree_hdi_wb_data$efree <- ecfree_hdi_wb_data$`overall score`
@@ -459,7 +472,7 @@ ecfree_hdi_wb_data$population <- ecfree_hdi_wb_data$SP.POP.TOTL
 ecfree_hdi_wb_data$gni_per_cap <- ecfree_hdi_wb_data$NY.GNP.PCAP.PP.CD
 ecfree_hdi_wb_data$gni_per_cap_percent <- ecfree_hdi_wb_data$NY.GNP.PCAP.KD.ZG
 
-ecfree_hdi_wb_data$gdp <- ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD
+ecfree_hdi_wb_data$gdp_per_cap <- ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD
 ecfree_hdi_wb_data$gini <- ecfree_hdi_wb_data$SI.POV.GINI
 
 
@@ -634,7 +647,8 @@ write_csv(ecfree_hdi_wb_data, "output/ecfree_hdi_wb_data.csv")
 
 
 ```{r}
-gov_data_save <- ecfree_hdi_wb_data %>% select(country, iso3c, iso2c, year, population, gni_per_cap, gni_per_cap_percent, gni_01, gni_z, efree, efree_01, efree_z, hdi, hdi_01, hdi_z)
+gov_data_save <- ecfree_hdi_wb_data %>% 
+  select(country, iso3c, region, `sub-region`, year, population, gni_per_cap, gni_per_cap_percent, gdp_per_cap, efree, hdi, gini)
 write_csv(gov_data_save, "output/gov_data_year.csv")
 ```
 

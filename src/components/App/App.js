@@ -455,7 +455,7 @@ class App extends Component {
                 connections between countries and patterns within a country,
                 both at a global scale, and also at a country-level scale for
                 seeing year-to-year changes up close. After exploring the
-                visualization,{" "}
+                visualization{" "}
                 <a
                   href="http://vallandingham.me/world_gov_challenge/analysis.nb.html"
                   target="_blank"

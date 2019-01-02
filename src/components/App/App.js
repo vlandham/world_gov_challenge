@@ -321,7 +321,7 @@ class App extends Component {
           <Row>
             <Col>
               <h1>Good Governments Help People to Succeed</h1>
-              <h5 className="author">Jim Vallandingham</h5>
+              <h5 className="author">by Jim Vallandingham</h5>
             </Col>
           </Row>
           <Row>
@@ -330,27 +330,31 @@ class App extends Component {
               <div className="blank" />
               <p>
                 This visual exploration looks at answering the question of what
-                makes a good government from an individual's perspective.
+                makes a <strong>good government</strong> from an individual's
+                perspective.
               </p>
               <p>
                 When thinking of the attributes that make a government “good”,
-                it is easy to fall back on a commonly used measurement like the
-                Gross Domestic Product (GDP) that showcase a government’s power
-                and progress. The GDP measures the value of goods and services
-                produced in a period of time. It ranks countries, and their
-                governments, by output, with more output being associated with a
-                “better” government.
+                it is easy to fall back on a commonly used measurement like the{" "}
+                <strong>Gross Domestic Product (GDP)</strong> that showcase a
+                government’s power and progress. The GDP measures the value of
+                goods and services produced in a period of time. It ranks
+                countries, and their governments, by output, with more output
+                being associated with a “better” government.
               </p>
 
               <p>
                 While the top economic progress is a tempting answer for what
-                makes a government successful, metrics like the GDP fail to
-                explain what makes a government good or bad for the individuals
-                living under that government. A high GDP doesn’t necessarily
-                mean a high quality of life. We, as governed people, need to
-                take a more nuanced look at the quality of government, through
-                the lense of social well-being and enablement of individual
-                progress.
+                makes a government successful, metrics like the GDP{" "}
+                <strong>fail</strong> to explain what makes a government good or
+                bad for the <strong>individuals</strong> living under that
+                government. A high GDP doesn’t necessarily mean a high quality
+                of life.
+              </p>
+              <p>
+                We, as governed people, need to take a more nuanced look at the
+                quality of government, through the lense of social well-being
+                and enablement of individual progress.
               </p>
 
               <blockquote cite="Thomas Jefferson">

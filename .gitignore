@@ -26,3 +26,4 @@ yarn-error.log*
 # R
 .Rproj.user
 .DS_Store
+.Rhistory

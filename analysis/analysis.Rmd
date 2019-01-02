@@ -1,6 +1,8 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "World Data Visualization Challange - Analysis"
+output: 
+  html_notebook: 
+    theme: spacelab
 ---
 
 Welcome to the World Data Visualization Challenge Exploration Notebook! Let's dig into how I ([Jim Vallandingham](http://vallandingham.me/)) started the analysis of this data, found additional related historical data, and tried to find a story in it all.
@@ -246,7 +248,335 @@ The comparisons we have looked at show a snap-shot of how countries are performi
 I wanted to find the answers to some of these questions. And to do that, I need historical data. 
 
 
-### Adding Historic Data
+## Historic Metric Data
 
 Fortunately, the starting dataset provided references to the sources for all the columns of data. 
 
+Because the SEDA metric is such an amalgamation of other metrics, and because it is highly correlated with the other measurements, I chose not to pursue historical data for it. 
+
+Instead, I focused on getting historical data for HDI, economic freedom, and Gini, along with the more traditional GDP value. 
+
+**Economic Freedom**
+
+The [Heritage Foundation](https://www.heritage.org/index/explore?view=by-region-country-year) has an option to view all the historic data. Unfortunately, I couldn't get the download button to download more than just the current year. So instead, I copied the table and pasted it into Numbers (which worked but took forever). Then saved it as a CSV. 
+
+```{r}
+filename <- "data/heritage_economic_freedom_score.csv"
+ecfree_data <- read_csv(filename, na = "N/A")
+```
+
+**Human Development Index (HDI)**
+
+The [UN provides HDI](http://hdr.undp.org/en/indicators/137506) as a CSV. I downloaded it, ensured the encoding was in UTF-8, and put it in the data directory. We can load it easily, and quickly remove all the spacer columns.
+
+```{r}
+filename <- "data/Human Development Index.csv"
+hdi_data <- read_csv(filename)
+# drop X# columns. dangerous, but easy. 
+hdi_data <- hdi_data %>% select(-contains('X'))
+```
+
+The original version is in a "wide" format, we want it "long" - so we can easily join by country and year with other datasets. [gather()](https://tidyr.tidyverse.org/reference/gather.html) does this nicely for us. Note the cool use of a negative `one_of()` to exclude a specified set of columns, and thus include all the others.
+
+```{r}
+hdi_data_long <- hdi_data %>% gather(key = "year", value = "hdi_value", -one_of("Country", "HDI Rank (2017)"))
+```
+
+Then, make some quick derived columns for joining. 
+
+```{r}
+hdi_data_long$country <- hdi_data_long$Country
+hdi_data_long$year_n <- as.numeric(hdi_data_long$year)
+```
+
+**World Bank Data**
+
+The rest of the metrics I found I could get from the [World Bank](https://data.worldbank.org/indicator). 
+
+Lucky for me, with a bit of Googling, I found t sweet sweet [wbstats R package](https://cran.r-project.org/web/packages/wbstats/vignettes/Using_the_wbstats_package.html) which allows you to pull down multiple WorldBank metrics via R! Super cool, and super useful. This will be a package to check out more for future projects as well.
+
+```{r}
+# install with:
+# install.packages('wbstats')
+library(wbstats)
+```
+
+Using the search feature of `wbstats` and the online World Bank indicators page, I found the ID's of the metrics I wanted. Here's how to pull down the data, with some notes:
+
+```{r}
+# Metric IDs
+# NY.GDP.PCAP.PP.CD = GDP per capita, PPP (current international $)
+# NY.GDP.MKTP.KD.ZG = GDP growth (annual %)
+# NY.GDP.PCAP.KD.ZG = GDP per capita growth (annual %) 
+# NY.GNP.PCAP.PP.CD = GNI per capita, PPP (current international $)
+# NY.GNP.PCAP.KD.ZG = GNI per capita growth (annual %)
+
+# SI.POV.GINI = GINI index (World Bank estimate)
+# SP.POP.TOTL = population total
+
+indicators <- c('NY.GDP.PCAP.PP.CD', 'NY.GNP.PCAP.PP.CD', 'NY.GNP.PCAP.KD.ZG', 'SI.POV.GINI', 'SP.POP.TOTL')
+wb_data <- wb(country= "all", indicator = indicators, startdate = 2000, enddate = 2018, return_wide = TRUE)
+```
+
+You'll note that i limited the year range to be between 2000 and 2018. This seemed like a decent enough year span to see some changes, but recent enough to be meaningful. Perhaps I should have investigated good year ranges more.
+
+```{r}
+# need a numeric year for joining.
+wb_data$year = as.numeric(wb_data$date)
+```
+
+
+**Region Data**
+
+Finally, I wanted a way to group these countries into higher themes. I happened upon [this Github repo](https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes) which includes a mapping from iso code to region name. Seemed like a good addition to me!
+
+```{r}
+filename <- "data/country_regions.csv"
+regions_data <- read_csv(filename)
+```
+
+### Joining Data
+
+Now that we have all the ingredients, let's join them all together in a super dataframe!
+
+There are probably better ways to do this in R, but I went with piecewise joining with `left_join()`.
+
+```{r}
+ecfree_hdi_data <- left_join(ecfree_data, hdi_data_long, by = c("name" = "country", "index year" = "year_n"))
+```
+
+```{r}
+ecfree_hdi_wb_data <- left_join(ecfree_hdi_data, wb_data, by = c("name" = "country", "index year" = "year"))
+```
+
+```{r}
+ecfree_hdi_wb_data <- left_join(ecfree_hdi_wb_data, regions_data, by = c("iso3c" = "alpha-3"))
+```
+
+So now this oddly named dataframe `ecfree_hdi_wb_data` includes columns from the above sources. 
+
+**Normalization**
+
+Hastily, I added even more columns to the dataset for easier access. I also added a z-score normalized value and a min/max normalized value for many of the variables - to make them easier to compare. 
+
+```{r}
+range01 <- function(x){(x-min(x, na.rm = TRUE))/(max(x, na.rm = TRUE)-min(x, na.rm = TRUE))}
+```
+
+
+```{r}
+# renames to make accessing columns easier.
+# should probably rename column directly, instead of just tacking on more columns
+ecfree_hdi_wb_data$country <- ecfree_hdi_wb_data$name.x
+ecfree_hdi_wb_data$year <- ecfree_hdi_wb_data$`index year`
+ecfree_hdi_wb_data$hdi <- ecfree_hdi_wb_data$hdi_value
+ecfree_hdi_wb_data$efree <- ecfree_hdi_wb_data$`overall score`
+ecfree_hdi_wb_data$gini <- ecfree_hdi_wb_data$SI.POV.GINI
+
+ecfree_hdi_wb_data$population <- ecfree_hdi_wb_data$SP.POP.TOTL
+ecfree_hdi_wb_data$gni_per_cap <- ecfree_hdi_wb_data$NY.GNP.PCAP.PP.CD
+ecfree_hdi_wb_data$gni_per_cap_percent <- ecfree_hdi_wb_data$NY.GNP.PCAP.KD.ZG
+ecfree_hdi_wb_data$gdp_per_cap <- ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD
+
+ecfree_hdi_wb_data$country_size <- ifelse(ecfree_hdi_wb_data$population > small_country_max_pop, 'big', 'little')
+
+# z-scores
+ecfree_hdi_wb_data$gdp_z <- scale(ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD, center = TRUE, scale = TRUE)
+ecfree_hdi_wb_data$gini_z <- scale(ecfree_hdi_wb_data$SI.POV.GINI, center = TRUE, scale = TRUE)
+ecfree_hdi_wb_data$hdi_z <- scale(ecfree_hdi_wb_data$hdi_value, center = TRUE, scale = TRUE)
+ecfree_hdi_wb_data$efree_z <- scale(ecfree_hdi_wb_data$`overall score`, center = TRUE, scale = TRUE)
+ecfree_hdi_wb_data$gni_z <- scale(ecfree_hdi_wb_data$gni_per_cap, center = TRUE, scale = TRUE)
+
+# min/max normalization
+ecfree_hdi_wb_data$gdp_01 <- range01(ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD)
+ecfree_hdi_wb_data$hdi_01 <- range01(ecfree_hdi_wb_data$hdi_value)
+ecfree_hdi_wb_data$efree_01 <- range01(ecfree_hdi_wb_data$`overall score`)
+ecfree_hdi_wb_data$gini_01 <- range01(ecfree_hdi_wb_data$SI.POV.GINI)
+ecfree_hdi_wb_data$gdp_log01 <- range01(log(ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD))
+ecfree_hdi_wb_data$gni_01 <- range01(ecfree_hdi_wb_data$gni_per_cap)
+```
+
+### Data Exploration 
+
+Now we can do some exploring!
+
+First, let's look at just a single year, and compare HDI to GDP like we did above - to confirm the historical data isn't radically different. 
+
+```{r}
+ecfree_hdi_wb_data %>% filter(year == 2017) %>%
+  ggplot(aes(x = gdp_per_cap, y = hdi)) + 
+  labs(title = "GDP vs HDI") + 
+  geom_text(check_overlap = TRUE, aes(label = country)) + 
+  geom_point()
+```
+
+We can use `facet_wrap()` to show the same data for a subset of the years. 
+
+```{r}
+ecfree_hdi_wb_data %>% filter(year > 2006) %>%
+  ggplot(aes(x = gdp_per_cap, y = hdi)) + 
+  labs(title = "GDP vs HDI - 2007 - 2017") + 
+  geom_point(alpha=0.2, size=1) + 
+  geom_text(check_overlap = TRUE, aes(label = country), size = 2) +
+  facet_wrap(~ year)
+```
+
+Things are looking pretty good, though we note we are missing 2018 data. This is because World Bank doesn't have this data available yet. 
+
+Let's look at the correlations for the different metrics like we did before, but now with all these additonal time points, to ensure the connections hold.
+
+```{r}
+ecfree_hdi_wb_data %>% 
+  select(gdp_per_cap, gini, efree, hdi) %>% 
+  cor(use = "complete.obs") %>% 
+  corrplot(type = "upper", order = "hclust", tl.col = "black", tl.srt = 45)
+```
+
+Appears to be pretty similar!
+
+### Grouping by Country
+
+I wanted to see trends in these metrics over time by country. 
+
+Here is a grouping process that uses `group_by()` to summarise data by metric. There is a bit of work to do around finding the first and last values, as not all years have data for all countries. 
+
+**GDP**
+
+```{r warning=FALSE}
+gdp_by_country <- ecfree_hdi_wb_data %>% group_by(country) %>% summarise(
+  first_gdp_year = year[max(which(!is.na(gdp_per_cap)))], 
+  last_gdp_year = year[min(which(!is.na(gdp_per_cap)))], 
+  years_of_gdp = last_gdp_year - first_gdp_year,
+  first_gdp_value = gdp_per_cap[max(which(!is.na(gdp_per_cap)))], 
+  last_gdp_value = gdp_per_cap[min(which(!is.na(gdp_per_cap)))],
+  gdp_change = last_gdp_value - first_gdp_value,
+  gdp_change_by_year = gdp_change / years_of_gdp,
+  avg_gdp = mean(gdp_per_cap, na.rm = TRUE)
+  )
+```
+
+```{r}
+gdp_by_country %>% 
+  ggplot(aes(x = avg_gdp)) + geom_histogram(bins=30)
+```
+
+So almost all countries increased in GDP, which makes sense. 
+
+**Gini**
+
+```{r warning=FALSE}
+gini_by_country <- ecfree_hdi_wb_data %>% group_by(country) %>% summarise(
+  first_gini_year = year[max(which(!is.na(gini)))], 
+  last_gini_year = year[min(which(!is.na(gini)))], 
+  years_of_gini = last_gini_year - first_gini_year,
+  first_gini_value = gini[max(which(!is.na(gini)))], 
+  last_gini_value = gini[min(which(!is.na(gini)))],
+  gini_change = last_gini_value - first_gini_value,
+  gini_change_by_year = gini_change / years_of_gini,
+  avg_gini = mean(gini, na.rm = TRUE)
+  )
+
+gini_by_country <- gini_by_country %>% filter(years_of_gini > 1)
+gini_by_country$gini_category = ifelse(gini_by_country$gini_change_by_year < 0, "more equal", "less equal")
+```
+
+A little more effort gets our first and last values in long format:
+
+```{r}
+gini_start_end <- gini_by_country %>% 
+  select(c(country, gini_category, first_gini_value, last_gini_value)) %>% 
+  gather(key = "metric", value = "value", first_gini_value, last_gini_value)
+```
+
+Which we can visualize:
+
+```{r}
+gini_start_end %>% 
+  ggplot(aes(x = metric, y = value, group = country, colour = gini_category)) +
+  geom_line() + 
+  geom_text(check_overlap = TRUE, aes(label = country), size = 4, colour = 'black') +
+  facet_wrap(~ gini_category)
+```
+
+Here I wanted to see if there were trends in gini movement, so I made a quick slopechart between the country's first and last Gini index value. Changes don't seem to follow any immediate pattern. 
+
+**Economic Freedom**
+
+```{r warning=FALSE}
+efree_by_country <- ecfree_hdi_wb_data %>% group_by(country) %>% summarise(
+  first_efree_year = year[max(which(!is.na(efree)))], 
+  last_efree_year = year[min(which(!is.na(efree)))], 
+  years_of_efree = last_efree_year - first_efree_year,
+  first_efree_value = efree[max(which(!is.na(efree)))], 
+  last_efree_value = efree[min(which(!is.na(efree)))],
+  efree_change = last_efree_value - first_efree_value,
+  efree_change_by_year = efree_change / years_of_efree,
+  avg_efree = mean(efree, na.rm = TRUE)
+  )
+
+efree_by_country <- efree_by_country %>% filter(years_of_efree > 1)
+```
+
+```{r}
+efree_by_country %>% 
+  ggplot(aes(x = last_efree_value - first_efree_value)) + geom_histogram()
+```
+
+Most countries remained relatively stable, with some big ups and downs.
+
+Here are the countries that changed the most:
+
+```{r}
+efree_by_country %>% 
+  filter(abs(efree_change) > 15) %>% 
+  arrange(-1 * efree_change) %>%
+  select(c(country, first_efree_value, last_efree_value, efree_change))
+```
+
+Here's just another way to plot the same data:
+
+```{r}
+efree_by_country %>% #filter(abs(last_efree_value - first_efree_value) > 10) %>%
+  ggplot(aes(x = first_efree_value, y = last_efree_value)) +
+  geom_point() + 
+  geom_text(check_overlap = TRUE, aes(label = country), size = 4) +
+  labs(title = "Last Ec Freedom Value vs Fist Ec Freedom Value by Country")
+```
+
+
+### Connected Scatterplots
+
+At this point, I knew I wanted to show the connect between these different metrics over time. And I knew I wanted to try something a bit novel in terms of visualizing multiple metrcis together. So I decided to check out what this data looked like using [connected scatter plots](https://eagereyes.org/papers/the-connected-scatterplot-for-presenting-paired-time-series)!
+
+```{r}
+ecfree_hdi_wb_data %>% filter(country %in% c('Brazil', 'China', 'United Kingdom', 'United States')) %>% arrange(country, year) %>%
+  ggplot(aes( y = hdi, x = efree, colour = country)) + 
+  geom_text(check_overlap = TRUE, aes(label = year)) + 
+  geom_point() + 
+  geom_path()
+```
+
+Pretty nice! 
+
+Here is all of the countries together: 
+
+```{r}
+ecfree_hdi_wb_data  %>% arrange(country, year) %>%
+  ggplot(aes( y = hdi, x = gdp_per_cap, group = country)) + 
+  geom_text(check_overlap = TRUE, aes(label = year), alpha = 0.5) + 
+  geom_point(alpha = 0.1) + 
+  geom_path(alpha = 0.1)
+```
+
+
+### Saving to CSV
+
+While this represents only a subset of the data exploration I did to get to the final form, I think it gives a good taste for the basic munging and searching required. 
+
+To end, I saved a subset of our combined data to CSV to start digging in more with D3 in the main visualization piece. 
+
+```{r}
+gov_data_save <- ecfree_hdi_wb_data %>% 
+  select(country, iso3c, region, `sub-region`, year, population, gni_per_cap, gni_per_cap_percent, gdp_per_cap, efree, hdi, gini)
+write_csv(gov_data_save, "output/gov_data_year.csv")
+```

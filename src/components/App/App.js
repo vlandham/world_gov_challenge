@@ -120,6 +120,10 @@ function processGroupedData(data) {
       country.values,
       d => d[METRICS["efree"]["display"]]
     );
+    country[METRICS["gini"].sortable] = d3.max(
+      country.values,
+      d => d[METRICS["gini"]["display"]]
+    );
   });
   return data;
 }
@@ -390,6 +394,12 @@ class App extends Component {
                 Heritage Foundation, tracks how well a government enables an
                 individual the freedom to work, produce, consume, and invest in
                 any way they please.
+              </p>
+              <p>
+                The <strong>Gini Index</strong> is a measure of inequality in
+                the distribution of individual or family income. A{" "}
+                <strong>lower</strong> value indicates a more equal distribution
+                of wealth.
               </p>
               <p>
                 The good news is that these metrics are correlated with more

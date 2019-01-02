@@ -27,6 +27,13 @@ export const METRICS = {
     local: "efree_norm_local",
     sortable: "efree_max"
   },
+  gini: {
+    label: "Gini Index",
+    display: "gini",
+    global: "gini_norm",
+    local: "gini_norm_local",
+    sortable: "gini_max"
+  },
   year: { label: "Year", display: "year" }
 };
 
@@ -35,6 +42,7 @@ export const CONFIGS = {
     options: [
       { label: "HDI vs GDP", id: "hdi_gdp" },
       { label: "Economic Freedom vs GDP", id: "efree_gdp" },
+      { label: "Gini vs GDP", id: "gini_gdp" },
       { label: "HDI vs Economic Freedom", id: "hdi_efree" }
     ]
   },
@@ -43,6 +51,7 @@ export const CONFIGS = {
       { label: "By HDI", id: "hdi" },
       { label: "By GDP", id: "gdp" },
       { label: "By Economic Freedom", id: "efree" },
+      { label: "By Gini Index", id: "gini" },
       { label: "By Region", id: "region" },
       { label: "Alphabetically", id: "alpha" }
     ]

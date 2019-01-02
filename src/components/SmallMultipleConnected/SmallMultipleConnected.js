@@ -24,8 +24,9 @@ import { METRICS } from "../../constants";
  */
 function sortData(data, sortOrder, xFunc, yFunc, zFunc) {
   if (METRICS[sortOrder]) {
+    const direction = sortOrder === "gini" ? "ascending" : "descending";
     data = data.sort((x, y) =>
-      d3.descending(
+      d3[direction](
         x[METRICS[sortOrder].sortable],
         y[METRICS[sortOrder].sortable]
       )

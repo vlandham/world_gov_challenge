@@ -138,7 +138,7 @@ class App extends Component {
       scatterHover: null,
       configs: {
         dataDisplay: "hdi_gdp",
-        sortOrder: "gdp",
+        sortOrder: "hdi",
         scale: "local"
       },
       colorScale: d3.scaleSequential(d3.interpolateOranges).domain([1990, 2020])

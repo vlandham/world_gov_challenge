@@ -63,7 +63,10 @@ export function spanContent(entries) {
  * Most styling is expected to come from CSS
  * so check out bubble_chart.scss for more details.
  */
-export function floatingTooltip(tooltipId, width) {
+export function floatingTooltip(
+  tooltipId,
+  config = { xOffset: 35, yOffset: -60, width: null }
+) {
   // Local variable to hold tooltip div for
   // manipulation in other functions.
   var tt = d3
@@ -74,8 +77,8 @@ export function floatingTooltip(tooltipId, width) {
     .html("");
 
   // Set a width if it is provided.
-  if (width) {
-    tt.style("width", width);
+  if (config.width) {
+    tt.style("width", config.width);
   }
 
   // Initially it is hidden.
@@ -112,8 +115,8 @@ export function floatingTooltip(tooltipId, width) {
    * based on d3 mouse evenggt.
    */
   function updatePosition(event) {
-    var xOffset = 35;
-    var yOffset = -60;
+    var xOffset = config.xOffset;
+    var yOffset = config.yOffset;
 
     var ttw = toNum(tt.style("width"));
     var tth = toNum(tt.style("height"));

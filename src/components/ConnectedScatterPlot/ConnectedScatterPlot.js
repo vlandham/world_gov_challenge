@@ -249,7 +249,7 @@ class ConnectedScatterPlot extends PureComponent {
         that.handleMouseout();
       });
     this.chart = this.g.append("g").classed("chart-group", true);
-    this.tooltip = floatingTooltip("_tooltip");
+    this.tooltip = floatingTooltip("_tooltip", { xOffset: 5, yOffset: 20 });
 
     this.highlight = this.g
       .append("circle")

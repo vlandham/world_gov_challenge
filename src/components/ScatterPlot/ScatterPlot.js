@@ -415,12 +415,12 @@ class ScatterPlot extends PureComponent {
     this.setupZoom(this.underlay);
 
     this.chart = this.g.append("g").classed("chart-group", true);
-    this.tooltip = floatingTooltip("_tooltip");
+    this.tooltip = floatingTooltip("_tooltip", { xOffset: 5, yOffset: 20 });
 
     this.highlight = this.g
       .append("circle")
       .attr("class", "highlight-circle")
-      .attr("r", radius + 2)
+      .attr("r", radius * 2)
       .style("fill", "none")
       .style("display", "none");
 
@@ -571,6 +571,7 @@ class ScatterPlot extends PureComponent {
         .filter(hoverFilter)
         .classed("highlight", true)
         .classed("dim", false)
+        .attr("r", radius * 1.5)
         .raise()
         .filter(hoverFilter)
         .classed("selected", true)

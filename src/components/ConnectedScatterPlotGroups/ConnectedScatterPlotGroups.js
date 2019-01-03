@@ -311,7 +311,7 @@ class ConnectedScatterPlotGroups extends Component {
         that.handleMouseout();
       });
     this.chart = this.g.append("g").classed("chart-group", true);
-    this.tooltip = floatingTooltip("_tooltip");
+    this.tooltip = floatingTooltip("_tooltip", { xOffset: 15, yOffset: 40 });
 
     this.highlight = this.g
       .append("circle")
@@ -361,61 +361,6 @@ class ConnectedScatterPlotGroups extends Component {
 
     this.updateAxes();
     this.updateCanvas();
-  }
-
-  /**
-   *
-   */
-  updateLine() {
-    const { dataFiltered, line, lineWidth } = this.props;
-    const lineBinding = this.chart.selectAll(".line").data([dataFiltered]);
-
-    const lineEnter = lineBinding
-      .enter()
-      .append("path")
-      .classed("line", true);
-
-    const lineMerged = lineEnter.merge(lineBinding);
-    lineMerged
-      .attr("fill", "none")
-      .attr("stroke", "#888")
-      // .attr("stroke", "url(#svgGradient)")
-      .attr("stroke-width", lineWidth)
-      .attr("stroke-linejoin", "round")
-      .attr("stroke-linecap", "round")
-      .attr("pointer-events", "none")
-      .attr("d", line);
-
-    lineBinding.exit().remove();
-  }
-
-  /**
-   *
-   */
-  updateChart() {
-    const { dataFiltered, xValue, yValue, colorValue, radius } = this.props;
-
-    this.updateLine();
-
-    const binding = this.chart
-      .selectAll(".dot")
-      .data(dataFiltered, datum => datum.key);
-
-    const enter = binding
-      .enter()
-      .append("circle")
-      .classed("dot", true);
-
-    const merged = enter.merge(binding);
-
-    merged
-      .attr("cx", xValue)
-      .attr("cy", yValue)
-      .attr("r", radius)
-      .attr("fill", colorValue);
-    merged.style("pointer-events", "none");
-
-    binding.exit().remove();
   }
 
   updateAxes() {
@@ -582,6 +527,19 @@ class ConnectedScatterPlotGroups extends Component {
     ctx.strokeStyle = lineColor.toString();
 
     if (hoverCountry) {
+      lineColor = d3.color("white");
+      lineColor.opacity = 0.8;
+      ctx.lineWidth = lineWidth * 5;
+      ctx.strokeStyle = lineColor.toString();
+
+      ctx.beginPath();
+      lineCanvas(hoverCountry.valuesFilter);
+      ctx.stroke();
+
+      ctx.lineWidth = lineWidth;
+      lineColor = d3.color("#888");
+      lineColor.opacity = scale === "global" ? 0.8 : 0.15;
+      ctx.strokeStyle = lineColor.toString();
       ctx.beginPath();
       lineCanvas(hoverCountry.valuesFilter);
       ctx.stroke();

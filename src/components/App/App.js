@@ -6,7 +6,7 @@ import AutoWidth from "../AutoWidth/AutoWidth";
 import ScatterPlot from "../ScatterPlot/ScatterPlot";
 import { tableContent } from "../tooltip/tooltip";
 import { formatNumber, roundNumber } from "../../utils/format";
-import { METRICS, SCATTER_LABELS, EXTENT } from "../../constants";
+import { METRICS, SCATTER_LABELS } from "../../constants";
 import SmallMultipleConnected from "../SmallMultipleConnected/SmallMultipleConnected";
 import ConfigurePanel from "../ConfigurePanel/ConfigurePanel";
 import ColorLegend from "../ColorLegend/ColorLegend";

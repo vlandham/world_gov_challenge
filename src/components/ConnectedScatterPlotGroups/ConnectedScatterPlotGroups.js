@@ -130,10 +130,6 @@ function chartProps(props) {
   }
 
   let voronoiDiagram = null;
-  const dataFiltered = data.filter(
-    datum => isfinite(xFunc(datum)) && isfinite(yFunc(datum))
-  );
-
   const pixelJitter = () => Math.random() - 0.5;
   voronoiDiagram = d3
     .voronoi()

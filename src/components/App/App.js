@@ -346,7 +346,7 @@ class App extends Component {
           </Row>
           <Row>
             <Col>
-              <h1>Good Governments Help People to Succeed</h1>
+              <h1>Good Governments Help People Succeed</h1>
               <h5 className="author">by Jim Vallandingham</h5>
             </Col>
           </Row>

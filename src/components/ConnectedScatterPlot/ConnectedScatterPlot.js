@@ -334,7 +334,7 @@ class ConnectedScatterPlot extends PureComponent {
   updateChart() {
     const { dataFiltered, xValue, yValue, colorValue, radius } = this.props;
 
-    this.updateLine();
+    // this.updateLine();
 
     const binding = this.chart
       .selectAll(".dot")
@@ -357,6 +357,9 @@ class ConnectedScatterPlot extends PureComponent {
     binding.exit().remove();
   }
 
+  /**
+   *
+   */
   updateAxes() {
     const {
       xMetric,
@@ -464,10 +467,13 @@ class ConnectedScatterPlot extends PureComponent {
       padding,
       lineWidth,
       scale,
-      lineCanvas
+      lineCanvas,
+      dataFiltered,
+      colorValue,
+      name
     } = this.props;
 
-    const color = d3.color("#ccc");
+    let color = d3.color("#ccc");
     color.opacity = scale === "global" ? 0.7 : 0.15;
 
     // get context
@@ -484,11 +490,23 @@ class ConnectedScatterPlot extends PureComponent {
     ctx.translate(padding.left, padding.top);
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = color.toString();
-    dataBackground.forEach((country, index) => {
-      ctx.beginPath();
-      lineCanvas(country.valuesFilter);
-      ctx.stroke();
+    dataBackground.forEach(country => {
+      if (country.key !== name) {
+        ctx.beginPath();
+        lineCanvas(country.valuesFilter);
+        ctx.stroke();
+      }
     });
+
+    ctx.lineWidth = lineWidth;
+    for (let i = 0; i < dataFiltered.length - 1; i++) {
+      const segData = [dataFiltered[i], dataFiltered[i + 1]];
+      const segColor = colorValue(dataFiltered[i]);
+      ctx.strokeStyle = segColor.toString();
+      ctx.beginPath();
+      lineCanvas(segData);
+      ctx.stroke();
+    }
   }
 
   /**

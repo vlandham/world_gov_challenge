@@ -114,14 +114,15 @@ function chartProps(props) {
   const line = d3
     .line()
     .x(xValue)
-    .y(yValue)
-    .curve(d3.curveCardinal.tension(0.3));
+    .y(yValue);
+  // .curve(d3.curveCardinal.tension(0.3));
 
   const lineCanvas = d3
     .line()
     .x(xValue)
-    .y(yValue)
-    .curve(d3.curveCardinal.tension(0.3));
+    .y(yValue);
+  // .curve(d3.curveNatural);
+  // .curve(d3.curveCardinal.tension(0.3));
 
   let colorValue = d => "#ddd";
   if (colorScale) {
@@ -500,14 +501,28 @@ class ConnectedScatterPlotGroups extends Component {
 
     let hoverCountry = null;
 
-    dataBackground.forEach((country, index) => {
+    dataBackground.forEach(country => {
       if (hover && hover.country === country.key) {
         hoverCountry = country;
       }
       if (country.valuesFilter.length > threshold) {
-        ctx.beginPath();
-        lineCanvas(country.valuesFilter);
-        ctx.stroke();
+        if (hover) {
+          ctx.beginPath();
+          lineCanvas(country.valuesFilter);
+          ctx.stroke();
+        } else {
+          for (let i = 0; i < country.valuesFilter.length - 1; i++) {
+            const segData = [
+              country.valuesFilter[i],
+              country.valuesFilter[i + 1]
+            ];
+            const segColor = colorValue(country.valuesFilter[i]);
+            ctx.strokeStyle = segColor.toString();
+            ctx.beginPath();
+            lineCanvas(segData);
+            ctx.stroke();
+          }
+        }
 
         country.valuesFilter.forEach(year => {
           let dotColor = lineColor;
@@ -543,6 +558,18 @@ class ConnectedScatterPlotGroups extends Component {
       ctx.beginPath();
       lineCanvas(hoverCountry.valuesFilter);
       ctx.stroke();
+
+      for (let i = 0; i < hoverCountry.valuesFilter.length - 1; i++) {
+        const segData = [
+          hoverCountry.valuesFilter[i],
+          hoverCountry.valuesFilter[i + 1]
+        ];
+        const segColor = colorValue(hoverCountry.valuesFilter[i]);
+        ctx.strokeStyle = segColor.toString();
+        ctx.beginPath();
+        lineCanvas(segData);
+        ctx.stroke();
+      }
 
       hoverCountry.valuesFilter.forEach(year => {
         const dotColor = colorValue(year);

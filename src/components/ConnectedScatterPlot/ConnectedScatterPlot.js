@@ -357,11 +357,25 @@ class ConnectedScatterPlot extends PureComponent {
   }
 
   updateAxes() {
-    const { xLabel, yLabel, plotHeight, plotWidth, padding } = this.props;
+    const {
+      xMetric,
+      yMetric,
+      xLabel,
+      yLabel,
+      plotHeight,
+      plotWidth,
+      padding
+    } = this.props;
 
     this.xAxis.attr("transform", `translate(${0}, ${plotHeight})`);
     this.xAxis.attr("font-size", 10).attr("fill", "none");
     this.yAxis.attr("font-size", 10).attr("fill", "none");
+
+    const xLowText = xMetric === "gini" ? "more equal" : "low";
+    const xHighText = xMetric === "gini" ? "less equal" : "high";
+
+    const yLowText = yMetric === "gini" ? "more equal" : "low";
+    const yHighText = yMetric === "gini" ? "less equal" : "high";
 
     this.xAxis
       .select(".bar")
@@ -378,7 +392,7 @@ class ConnectedScatterPlot extends PureComponent {
       .attr("y", 9)
       .attr("fill", "#333")
       .attr("dy", "0.6em")
-      .text("low");
+      .text(xLowText);
 
     this.xAxis
       .select(".high")
@@ -387,7 +401,7 @@ class ConnectedScatterPlot extends PureComponent {
       .attr("text-anchor", "end")
       .attr("fill", "#333")
       .attr("dy", "0.6em")
-      .text("high");
+      .text(xHighText);
 
     this.yAxis
       .select(".bar")
@@ -408,7 +422,7 @@ class ConnectedScatterPlot extends PureComponent {
         "transform",
         `rotate(270) translate(${-plotHeight} ${-padding.left + 18})`
       )
-      .text("low");
+      .text(yLowText);
 
     this.yAxis
       .select(".high")
@@ -418,7 +432,7 @@ class ConnectedScatterPlot extends PureComponent {
       .attr("fill", "#333")
       .attr("dy", "0.6em")
       .attr("transform", `rotate(270) translate(${0} ${-padding.left + 18})`)
-      .text("high");
+      .text(yHighText);
 
     this.yAxisLabel
       .attr(

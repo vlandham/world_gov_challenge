@@ -120,7 +120,7 @@ function processGroupedData(data) {
       country.values,
       d => d[METRICS["efree"]["display"]]
     );
-    country[METRICS["gini"].sortable] = d3.max(
+    country[METRICS["gini"].sortable] = d3.min(
       country.values,
       d => d[METRICS["gini"]["display"]]
     );

@@ -43,7 +43,9 @@ export const CONFIGS = {
       { label: "HDI vs GDP", id: "hdi_gdp" },
       { label: "Economic Freedom vs GDP", id: "efree_gdp" },
       { label: "Gini vs GDP", id: "gini_gdp" },
-      { label: "HDI vs Economic Freedom", id: "hdi_efree" }
+      { label: "HDI vs Economic Freedom", id: "hdi_efree" },
+      { label: "HDI vs Gini", id: "hdi_gini" },
+      { label: "Gini vs Economic Freedom", id: "gini_efree" }
     ]
   },
   sortOrder: {

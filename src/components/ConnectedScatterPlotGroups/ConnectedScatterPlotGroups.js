@@ -29,7 +29,6 @@ function isHoverEqual(a, b) {
 function chartProps(props) {
   const {
     dataBackground,
-    data,
     xFunc,
     yFunc,
     zFunc,
@@ -677,7 +676,6 @@ class ConnectedScatterPlotGroups extends Component {
 export default addComputedProps(chartProps, {
   changeInclude: [
     "dataBackground",
-    "data",
     "scale",
     "sortOrder",
     "width",

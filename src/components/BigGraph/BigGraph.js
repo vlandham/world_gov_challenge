@@ -4,7 +4,6 @@ import addComputedProps from "react-computed-props";
 import AutoWidth from "../AutoWidth/AutoWidth";
 import ConnectedScatterPlotGroups from "../ConnectedScatterPlotGroups/ConnectedScatterPlotGroups";
 
-import ColorLegend from "../ColorLegend/ColorLegend";
 import { tableContent } from "../tooltip/tooltip";
 import { formatNumber } from "../../utils/format";
 import { METRICS, EXTENT } from "../../constants";
@@ -64,7 +63,6 @@ class BigGraph extends Component {
    */
   renderBigGraph() {
     const {
-      data,
       dataGrouped,
       colorScale,
       scale,
@@ -82,7 +80,6 @@ class BigGraph extends Component {
     return (
       <AutoWidth>
         <ConnectedScatterPlotGroups
-          data={data}
           dataBackground={dataGrouped}
           xMetric={xMetric}
           yMetric={yMetric}
@@ -101,13 +98,6 @@ class BigGraph extends Component {
         />
       </AutoWidth>
     );
-  }
-  /**
-   *
-   */
-  renderLegend() {
-    const { colorScale } = this.props;
-    return <ColorLegend colorScale={colorScale} domain={[2001, 2017]} />;
   }
 
   render() {

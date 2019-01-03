@@ -486,7 +486,7 @@ class ConnectedScatterPlot extends PureComponent {
     ctx.strokeStyle = color.toString();
     dataBackground.forEach((country, index) => {
       ctx.beginPath();
-      lineCanvas(country.values);
+      lineCanvas(country.valuesFilter);
       ctx.stroke();
     });
   }
@@ -571,6 +571,7 @@ class ConnectedScatterPlot extends PureComponent {
 export default addComputedProps(chartProps, {
   changeInclude: [
     "data",
+    "dataBackground",
     "scale",
     "sortOrder",
     "width",

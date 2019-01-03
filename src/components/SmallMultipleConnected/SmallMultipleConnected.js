@@ -50,11 +50,11 @@ function sortData(data, sortOrder, xFunc, yFunc, zFunc) {
  */
 function filterData(data, threshold, xFunc, yFunc) {
   return data.filter(country => {
-    const validYears = country.values.filter(year => {
+    country.valuesFilter = country.values.filter(year => {
       return isfinite(xFunc(year)) && isfinite(yFunc(year));
     });
 
-    return validYears.length > threshold;
+    return country.valuesFilter.length > threshold;
   });
 }
 
@@ -75,7 +75,7 @@ function chartProps(props) {
   const yFunc = d => d[METRICS[yMetric][scale]];
   const zFunc = d => d[METRICS[zMetric].display];
 
-  dataGrouped = filterData(dataGrouped, 4, xFunc, yFunc);
+  dataGrouped = filterData(dataGrouped, 3, xFunc, yFunc);
 
   dataGrouped = sortData(dataGrouped, sortOrder, xFunc, yFunc, zFunc);
 

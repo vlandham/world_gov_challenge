@@ -99,6 +99,7 @@ function groupData(data) {
     .nest()
     .key(d => d.country)
     .entries(data);
+
   return dataGrouped;
 }
 

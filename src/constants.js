@@ -1,3 +1,5 @@
+export const EXTENT = [-0.05, 1.05];
+
 export const METRICS = {
   hdi: {
     label: "Human Development Index",

@@ -6,11 +6,13 @@ import AutoWidth from "../AutoWidth/AutoWidth";
 import ScatterPlot from "../ScatterPlot/ScatterPlot";
 import { tableContent } from "../tooltip/tooltip";
 import { formatNumber, roundNumber } from "../../utils/format";
-import { METRICS, SCATTER_LABELS } from "../../constants";
+import { METRICS, SCATTER_LABELS, EXTENT } from "../../constants";
 import SmallMultipleConnected from "../SmallMultipleConnected/SmallMultipleConnected";
 import ConfigurePanel from "../ConfigurePanel/ConfigurePanel";
+import ColorLegend from "../ColorLegend/ColorLegend";
 
 import "./App.scss";
+import BigGraph from "../BigGraph/BigGraph";
 
 /**
  *
@@ -263,6 +265,24 @@ class App extends Component {
   /**
    *
    */
+  renderBigGraph() {
+    const { data, dataGrouped, configs, colorScale } = this.state;
+    const [yMetric, xMetric] = configs.dataDisplay.split("_");
+
+    return (
+      <BigGraph
+        data={data}
+        dataGrouped={dataGrouped}
+        colorScale={colorScale}
+        xMetric={xMetric}
+        yMetric={yMetric}
+      />
+    );
+  }
+
+  /**
+   *
+   */
   renderSmallMult() {
     const { dataGrouped, configs, colorScale } = this.state;
 
@@ -283,8 +303,23 @@ class App extends Component {
   /**
    *
    */
-  renderConfigPanel() {
-    return <ConfigurePanel onClick={this.handleConfigClick} />;
+  renderConfigPanel(size = null) {
+    const { configs } = this.state;
+    return (
+      <ConfigurePanel
+        configs={configs}
+        size={size}
+        onClick={this.handleConfigClick}
+      />
+    );
+  }
+
+  /**
+   *
+   */
+  renderLegend() {
+    const { colorScale } = this.state;
+    return <ColorLegend colorScale={colorScale} domain={[2001, 2017]} />;
   }
 
   /**
@@ -469,6 +504,14 @@ class App extends Component {
             </Col>
           </Row>
           <Row>
+            <Col sm={6}>{this.renderConfigPanel("small")}</Col>
+            <Col sm={6}>{this.renderLegend()}</Col>
+          </Row>
+          <Row>
+            <Col sm={12}>{this.renderBigGraph()}</Col>
+          </Row>
+          <Row>
+            <div className="blank" />
             <Col sm={12}>{this.renderConfigPanel()}</Col>
           </Row>
 

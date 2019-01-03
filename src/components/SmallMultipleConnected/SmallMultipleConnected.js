@@ -13,7 +13,7 @@ import { formatNumber } from "../../utils/format";
 import "./SmallMultipleConnected.scss";
 import AutoWidth from "../AutoWidth/AutoWidth";
 
-import { METRICS } from "../../constants";
+import { METRICS, EXTENT } from "../../constants";
 
 /**
  *
@@ -105,8 +105,6 @@ function chartProps(props) {
     tooltipTextFunc
   };
 }
-
-const EXTENT = [-0.05, 1.05];
 
 /**
  *

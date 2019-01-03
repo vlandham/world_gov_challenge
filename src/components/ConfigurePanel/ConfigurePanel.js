@@ -10,18 +10,32 @@ import { CONFIGS } from "../../constants";
 
 import "./ConfigurePanel.scss";
 
+function indexOf(key, objs) {
+  const keys = objs.map(o => o.id);
+  return keys.indexOf(key);
+}
+
 class ConfigurePanel extends Component {
   constructor(props) {
     super(props);
 
+    console.log(props);
+
+    const { configs } = props;
+
     this.toggle = this.toggle.bind(this);
     this.click = this.click.bind(this);
+
+    const dataDisplayIndex = indexOf(
+      configs.dataDisplay,
+      CONFIGS.dataDisplay.options
+    );
 
     this.state = {
       dataDisplay: {
         dropdownOpen: false,
-        selectIndex: 0,
-        selectedId: CONFIGS.dataDisplay.options[0].id
+        selectIndex: dataDisplayIndex,
+        selectedId: CONFIGS.dataDisplay.options[dataDisplayIndex].id
       },
       sortOrder: {
         dropdownOpen: false,
@@ -34,6 +48,24 @@ class ConfigurePanel extends Component {
         selectedId: CONFIGS.scale.options[0].id
       }
     };
+  }
+
+  /**
+   * When the react component updates, update the d3 vis
+   */
+  componentDidUpdate() {
+    const { configs } = this.props;
+    const { dataDisplay } = this.state;
+    const dataDisplayIndex = indexOf(
+      configs.dataDisplay,
+      CONFIGS.dataDisplay.options
+    );
+
+    if (dataDisplayIndex !== dataDisplay.selectIndex) {
+      dataDisplay.selectIndex = dataDisplayIndex;
+      dataDisplay.selectedId = CONFIGS.dataDisplay.options[dataDisplayIndex].id;
+      this.setState({ dataDisplay });
+    }
   }
 
   toggle(dropdownId) {
@@ -84,6 +116,15 @@ class ConfigurePanel extends Component {
   }
 
   render() {
+    const { size } = this.props;
+    if (size === "small") {
+      return (
+        <div className="ConfigurePanel">
+          Showing {this.renderDropdown("dataDisplay")}
+        </div>
+      );
+    }
+
     return (
       <div className="ConfigurePanel">
         Showing {this.renderDropdown("dataDisplay")} sorted{" "}

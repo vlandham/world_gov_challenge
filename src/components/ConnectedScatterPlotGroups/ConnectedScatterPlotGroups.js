@@ -1,20 +1,47 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import addComputedProps from "react-computed-props";
 import * as d3 from "d3";
 import isfinite from "lodash.isfinite";
 import { floatingTooltip } from "../tooltip/tooltip";
 
-import "./ConnectedScatterPlot.scss";
+import "./ConnectedScatterPlotGroups.scss";
+
+function isHoverEqual(a, b) {
+  if (!a && !b) {
+    return true;
+  }
+
+  if (!a && b) {
+    return false;
+  }
+  if (a && !b) {
+    return false;
+  }
+
+  return a.key === b.key;
+}
 
 /**
  *
  * @param {*} props
  */
 function chartProps(props) {
-  const { data, xFunc, yFunc, zFunc, colorScale, height, width, scale } = props;
+  const {
+    dataBackground,
+    data,
+    xFunc,
+    yFunc,
+    zFunc,
+    colorScale,
+    height,
+    width,
+    scale
+  } = props;
 
   let { xExtent, yExtent } = props;
+
+  const threshold = 3;
 
   const padding = {
     top: 20,
@@ -35,17 +62,48 @@ function chartProps(props) {
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
 
-  const dataFiltered = data.filter(
-    datum => isfinite(xFunc(datum)) && isfinite(yFunc(datum))
-  );
+  let allData = [];
 
-  xExtent = xExtent || d3.extent(data, xFunc);
+  dataBackground.forEach(country => {
+    country.valuesFilter = country.values.filter(
+      datum => isfinite(xFunc(datum)) && isfinite(yFunc(datum))
+    );
+
+    if (country.valuesFilter.length > threshold) {
+      allData = allData.concat(country.valuesFilter);
+    }
+
+    country.meanX = d3.mean(country.valuesFilter, xFunc);
+    country.meanY = d3.mean(country.valuesFilter, yFunc);
+
+    if (!xExtent) {
+      country.minX = d3.min(country.valuesFilter, xFunc);
+      country.maxX = d3.max(country.valuesFilter, xFunc);
+    }
+
+    if (!yExtent) {
+      country.minY = d3.min(country.valuesFilter, yFunc);
+      country.maxY = d3.max(country.valuesFilter, yFunc);
+    }
+  });
+
+  if (!xExtent) {
+    const xMin = d3.min(dataBackground, d => d.minX);
+    const xMax = d3.max(dataBackground, d => d.maxX);
+    xExtent = [xMin, xMax];
+  }
+
+  if (!yExtent) {
+    const yMin = d3.min(dataBackground, d => d.minY);
+    const yMax = d3.max(dataBackground, d => d.maxY);
+    yExtent = [yMin, yMax];
+  }
+
   const xScale = d3
     .scaleLinear()
     .domain(xExtent)
     .range([0, plotWidth]);
 
-  yExtent = yExtent || d3.extent(data, yFunc);
   const yScale = d3
     .scaleLinear()
     .domain(yExtent)
@@ -72,25 +130,26 @@ function chartProps(props) {
   }
 
   let voronoiDiagram = null;
+  const dataFiltered = data.filter(
+    datum => isfinite(xFunc(datum)) && isfinite(yFunc(datum))
+  );
 
-  if (data && data.length > 0) {
-    const pixelJitter = () => Math.random() - 0.5;
-    voronoiDiagram = d3
-      .voronoi()
-      .x(d => xValue(d) + pixelJitter())
-      .y(d => yValue(d) + pixelJitter())
-      .size([plotWidth, plotHeight])(dataFiltered);
-  }
+  const pixelJitter = () => Math.random() - 0.5;
+  voronoiDiagram = d3
+    .voronoi()
+    .x(d => xValue(d) + pixelJitter())
+    .y(d => yValue(d) + pixelJitter())
+    .size([plotWidth, plotHeight])(allData);
 
-  const mouseRadius = plotWidth / 3;
+  const mouseRadius = plotWidth / 10;
 
   const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
   const xAxis = d3.axisBottom(xScale).tickSizeOuter(0);
 
   return {
-    dataFiltered,
     line,
     lineCanvas,
+    threshold,
     padding,
     plotHeight,
     plotWidth,
@@ -112,7 +171,7 @@ function chartProps(props) {
 /**
  *
  */
-class ConnectedScatterPlot extends PureComponent {
+class ConnectedScatterPlotGroups extends Component {
   static propTypes = {
     data: PropTypes.array,
     name: PropTypes.string,
@@ -148,9 +207,11 @@ class ConnectedScatterPlot extends PureComponent {
    */
   constructor(props) {
     super(props);
+    this.state = { hover: null };
 
     this.handleMouseover = this.handleMouseover.bind(this);
     this.handleMouseout = this.handleMouseout.bind(this);
+    this.highlightCircle = this.highlightCircle.bind(this);
   }
 
   /**
@@ -198,7 +259,9 @@ class ConnectedScatterPlot extends PureComponent {
       tooltipTextFunc,
       onHover
     } = this.props;
+
     let { xScale, yScale } = this.props;
+    const { hover } = this.state;
 
     xScale = this.zoomTransform.rescaleX(xScale);
     yScale = this.zoomTransform.rescaleY(yScale);
@@ -215,6 +278,10 @@ class ConnectedScatterPlot extends PureComponent {
       if (tooltipTextFunc) {
         this.tooltip.showTooltip(tooltipTextFunc(d), d3.event);
       }
+    }
+
+    if (!isHoverEqual(hover, d)) {
+      this.setState({ hover: d });
     }
 
     if (onHover) {
@@ -241,7 +308,7 @@ class ConnectedScatterPlot extends PureComponent {
       .attr("width", plotWidth)
       .attr("height", plotHeight)
       .style("fill", "white")
-      .style("opacity", 0.001)
+      .style("opacity", 0.0001)
       .on("mousemove", function(d) {
         that.handleMouseover(this, d);
       })
@@ -297,7 +364,6 @@ class ConnectedScatterPlot extends PureComponent {
     const { padding } = this.props;
     this.g.attr("transform", `translate(${padding.left} ${padding.top})`);
 
-    this.updateChart();
     this.updateAxes();
     this.updateCanvas();
   }
@@ -464,11 +530,15 @@ class ConnectedScatterPlot extends PureComponent {
       padding,
       lineWidth,
       scale,
-      lineCanvas
+      lineCanvas,
+      xValue,
+      yValue,
+      radius,
+      colorValue,
+      threshold
     } = this.props;
 
-    const color = d3.color("#ccc");
-    color.opacity = scale === "global" ? 0.7 : 0.15;
+    const { hover } = this.state;
 
     // get context
     const ctx = this.canvas.getContext("2d");
@@ -483,12 +553,52 @@ class ConnectedScatterPlot extends PureComponent {
     // have some padding
     ctx.translate(padding.left, padding.top);
     ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = color.toString();
+
+    let lineColor = d3.color("#ccc");
+    lineColor.opacity = scale === "global" ? 0.8 : 0.15;
+    ctx.strokeStyle = lineColor.toString();
+
+    let hoverCountry = null;
+
     dataBackground.forEach((country, index) => {
-      ctx.beginPath();
-      lineCanvas(country.values);
-      ctx.stroke();
+      if (hover && hover.country === country.key) {
+        hoverCountry = country;
+      }
+      if (country.valuesFilter.length > threshold) {
+        ctx.beginPath();
+        lineCanvas(country.valuesFilter);
+        ctx.stroke();
+
+        country.valuesFilter.forEach(year => {
+          let dotColor = lineColor;
+          if (!hover) {
+            dotColor = colorValue(year);
+          }
+          ctx.beginPath();
+          ctx.arc(xValue(year), yValue(year), radius, 0, 2 * Math.PI, false);
+          ctx.fillStyle = dotColor.toString();
+          ctx.fill();
+        });
+      }
     });
+
+    lineColor = d3.color("#888");
+    lineColor.opacity = scale === "global" ? 0.8 : 0.15;
+    ctx.strokeStyle = lineColor.toString();
+
+    if (hoverCountry) {
+      ctx.beginPath();
+      lineCanvas(hoverCountry.valuesFilter);
+      ctx.stroke();
+
+      hoverCountry.valuesFilter.forEach(year => {
+        const dotColor = colorValue(year);
+        ctx.beginPath();
+        ctx.arc(xValue(year), yValue(year), radius, 0, 2 * Math.PI, false);
+        ctx.fillStyle = dotColor.toString();
+        ctx.fill();
+      });
+    }
   }
 
   /**
@@ -542,7 +652,7 @@ class ConnectedScatterPlot extends PureComponent {
     };
 
     return (
-      <div className="ConnectedScatterPlot">
+      <div className="ConnectedScatterPlotGroups">
         <h4 className="title">{name}</h4>
         <div className="chart-container">
           <canvas
@@ -570,6 +680,7 @@ class ConnectedScatterPlot extends PureComponent {
 
 export default addComputedProps(chartProps, {
   changeInclude: [
+    "dataBackground",
     "data",
     "scale",
     "sortOrder",
@@ -578,4 +689,4 @@ export default addComputedProps(chartProps, {
     "xMetric",
     "yMetric"
   ]
-})(ConnectedScatterPlot);
+})(ConnectedScatterPlotGroups);

@@ -9,7 +9,6 @@ import { formatNumber, roundNumber } from "../../utils/format";
 import { METRICS, SCATTER_LABELS } from "../../constants";
 import SmallMultipleConnected from "../SmallMultipleConnected/SmallMultipleConnected";
 import ConfigurePanel from "../ConfigurePanel/ConfigurePanel";
-import ColorLegend from "../ColorLegend/ColorLegend";
 
 import "./App.scss";
 
@@ -291,16 +290,7 @@ class App extends Component {
   /**
    *
    */
-  renderLegend() {
-    const { colorScale } = this.state;
-    return <ColorLegend colorScale={colorScale} domain={[2001, 2017]} />;
-  }
-
-  /**
-   *
-   */
   render() {
-    const { dataGrouped } = this.state;
     return (
       <div className="App">
         <Container>
@@ -481,14 +471,7 @@ class App extends Component {
           <Row>
             <Col sm={12}>{this.renderConfigPanel()}</Col>
           </Row>
-          <Row>
-            <Col sm={6}>
-              <span className="align-middle">
-                Data from 2000 to 2017 for {dataGrouped.length} countries.
-              </span>
-            </Col>
-            <Col sm={6}>{this.renderLegend()}</Col>
-          </Row>
+
           <Row>
             <Col sm={12}>{this.renderSmallMult()}</Col>
           </Row>

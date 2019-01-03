@@ -6,6 +6,7 @@ import * as d3 from "d3";
 import ConnectedScatterPlot from "../ConnectedScatterPlot/ConnectedScatterPlot";
 import isfinite from "lodash.isfinite";
 
+import ColorLegend from "../ColorLegend/ColorLegend";
 import { tableContent } from "../tooltip/tooltip";
 import { formatNumber } from "../../utils/format";
 
@@ -195,10 +196,26 @@ class SmallMultipleConnected extends Component {
   /**
    *
    */
+  renderLegend() {
+    const { colorScale } = this.props;
+    return <ColorLegend colorScale={colorScale} domain={[2001, 2017]} />;
+  }
+
+  /**
+   *
+   */
   render() {
     const { dataGrouped } = this.props;
     return (
       <div className="SmallMultipleConnected">
+        <Row>
+          <Col sm={6}>
+            <span className="align-middle">
+              Data from 2000 to 2017 for {dataGrouped.length} countries.
+            </span>
+          </Col>
+          <Col sm={6}>{this.renderLegend()}</Col>
+        </Row>
         <Row>
           {dataGrouped.map((d, i) => [
             this.renderRegion(d, i),

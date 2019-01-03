@@ -16,7 +16,7 @@ self.__precacheManifest = [
     "url": "/world_gov_challenge/static/css/main.c8b7cef6.chunk.css"
   },
   {
-    "revision": "3175ae162b0ff562f4341ad3272bd9dc",
+    "revision": "e15011f0a873979e8b8a8c60cf480b84",
     "url": "/world_gov_challenge/index.html"
   }
 ];

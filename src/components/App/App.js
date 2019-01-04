@@ -354,15 +354,11 @@ class App extends Component {
             <Col sm={2} />
             <Col sm={9}>
               <div className="blank" />
+              <p>What makes a “good” government?</p>
               <p>
-                This visual exploration looks at answering the question of what
-                makes a <strong>good government</strong> from an individual's
-                perspective.
-              </p>
-              <p>
-                When thinking of the attributes that make a government “good”,
-                it is easy to fall back on a commonly used measurement like the{" "}
-                <strong>Gross Domestic Product (GDP)</strong> that showcase a
+                When answering this question, it is easy to fall back on a
+                commonly used measurement like the{" "}
+                <strong>Gross Domestic Product (GDP)</strong> that showcases a
                 government’s power and progress. The GDP measures the value of
                 goods and services produced in a period of time. It ranks
                 countries, and their governments, by output, with more output
@@ -370,17 +366,12 @@ class App extends Component {
               </p>
 
               <p>
-                While the top economic progress is a tempting answer for what
-                makes a government successful, metrics like the GDP{" "}
+                Economic progress is a tempting answer for what makes a
+                government successful but metrics like the GDP{" "}
                 <strong>fail</strong> to explain what makes a government good or
                 bad for the <strong>individuals</strong> living under that
                 government. A high GDP doesn’t necessarily mean a high quality
                 of life.
-              </p>
-              <p>
-                We, as governed people, need to take a more nuanced look at the
-                quality of government, through the lense of social well-being
-                and enablement of individual progress.
               </p>
 
               <blockquote cite="Thomas Jefferson">
@@ -389,15 +380,15 @@ class App extends Component {
               </blockquote>
 
               <p>
-                This true purpose of government, to improve human life, is
-                nothing new. Thomas Jefferson, the principal author of the
-                Declaration of Independence and the third president of the
-                United States said as much during his lifetime.
+                We, as governed people, need to take a more nuanced look at the
+                quality of government, through the lense of social well-being
+                and enablement of individual progress.
               </p>
             </Col>
           </Row>
           <Row>
             <Col>
+              <div className="blank" />
               <h2>New Metrics to Understand Progress</h2>
             </Col>
           </Row>
@@ -432,8 +423,8 @@ class App extends Component {
                 of wealth.
               </p>
               <p>
-                The good news is that these metrics are correlated with more
-                performance metrics like GDP.
+                The good news is that these individual well-being metrics are
+                correlated with economic performance metrics like GDP.
               </p>
             </Col>
           </Row>
@@ -474,14 +465,14 @@ class App extends Component {
                 for each country.
               </p>
               <p>
-                The graphs use the x and y dimensions to plot different metric
-                values, with each year of data displayed connected together by a
-                line. Data from all countries is displayed in the background in
-                grey for comparison. Display options allow us to find
-                connections between countries and patterns within a country,
-                both at a global scale, and also at a country-level scale for
-                seeing year-to-year changes up close. After exploring the
-                visualization{" "}
+                The graph uses the x and y dimensions to plot different metrics,
+                with each year of data displayed connected together by a line.
+              </p>
+              <p>
+                Display options allow us to find connections between countries
+                and patterns within a country, both at a global scale, and also
+                at a country-level scale for seeing year-to-year changes up
+                close. After exploring the visualization{" "}
                 <a
                   href="http://vallandingham.me/world_gov_challenge/analysis.nb.html"
                   target="_blank"
@@ -501,7 +492,6 @@ class App extends Component {
           <Row>
             <Col sm={12}>
               <div className="blank" />
-              <h2>Connected Countries</h2>
             </Col>
           </Row>
           <Row>
@@ -518,6 +508,9 @@ class App extends Component {
 
           <Row>
             <Col sm={12}>{this.renderSmallMult()}</Col>
+          </Row>
+          <Row>
+            <div className="blank" />
           </Row>
           <Row>
             <Col sm={12} className="footer">

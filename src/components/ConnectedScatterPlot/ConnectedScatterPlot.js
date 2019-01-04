@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import addComputedProps from "react-computed-props";
 import * as d3 from "d3";
 import isfinite from "lodash.isfinite";
+import { AnnotationCalloutElbow } from "react-annotation";
 import { floatingTooltip } from "../tooltip/tooltip";
 
 import "./ConnectedScatterPlot.scss";
@@ -126,7 +127,8 @@ class ConnectedScatterPlot extends PureComponent {
     yExtent: PropTypes.array,
     width: PropTypes.number,
     height: PropTypes.number,
-    tooltipTextFunc: PropTypes.func
+    tooltipTextFunc: PropTypes.func,
+    annotations: PropTypes.array
   };
 
   static defaultProps = {
@@ -140,7 +142,8 @@ class ConnectedScatterPlot extends PureComponent {
     xLabel: "",
     yLabel: "",
     tooltipTextFunc: d => "",
-    colorScale: () => "#ddd"
+    colorScale: () => "#ddd",
+    annotations: []
   };
 
   /**
@@ -551,6 +554,59 @@ class ConnectedScatterPlot extends PureComponent {
   /**
    *
    */
+  renderAnnotations() {
+    const {
+      xValue,
+      yValue,
+      width,
+      height,
+      dataFiltered,
+      annotations,
+      padding
+    } = this.props;
+
+    if (!annotations || annotations.length === 0) {
+      return null;
+    }
+
+    const callouts = annotations.map(a => {
+      let yearData = dataFiltered.filter(d => d.year === a.year);
+
+      if (!yearData || yearData.length === 0) {
+        return null;
+      }
+
+      yearData = yearData[0];
+
+      const note = { label: a.text, lineType: "horizontal", align: null };
+
+      return (
+        <AnnotationCalloutElbow
+          key={a.year}
+          x={xValue(yearData)}
+          y={yValue(yearData)}
+          dx={a.dx}
+          dy={a.dy}
+          note={note}
+          color={"black"}
+          editMode={true}
+          onDragEnd={p => console.log(p)}
+        />
+      );
+    });
+
+    return (
+      <svg width={width} height={height} className="annotations">
+        <g transform={`translate(${padding.left}, ${padding.top})`}>
+          {callouts}
+        </g>
+      </svg>
+    );
+  }
+
+  /**
+   *
+   */
   render() {
     const { name, height, width, sizeScale } = this.props;
 
@@ -580,6 +636,7 @@ class ConnectedScatterPlot extends PureComponent {
             height={height}
             width={width}
           />
+          {this.renderAnnotations()}
         </div>
       </div>
     );

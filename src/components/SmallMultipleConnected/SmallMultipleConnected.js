@@ -13,7 +13,7 @@ import { formatNumber } from "../../utils/format";
 import "./SmallMultipleConnected.scss";
 import AutoWidth from "../AutoWidth/AutoWidth";
 
-import { METRICS, EXTENT } from "../../constants";
+import { METRICS, EXTENT, ANNOTATIONS } from "../../constants";
 
 /**
  *
@@ -140,6 +140,9 @@ class SmallMultipleConnected extends Component {
       colorScale,
       dataGrouped
     } = this.props;
+
+    const annotationKey = `${chartData.key}:${yMetric}:${xMetric}:${scale}`;
+    const annotations = ANNOTATIONS[annotationKey];
     return (
       <Col sm={4} key={chartData.key}>
         <AutoWidth>
@@ -161,6 +164,7 @@ class SmallMultipleConnected extends Component {
             yMetric={yMetric}
             scale={scale}
             dataBackground={dataGrouped}
+            annotations={annotations}
           />
         </AutoWidth>
       </Col>

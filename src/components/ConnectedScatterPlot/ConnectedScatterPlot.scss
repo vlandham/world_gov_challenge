@@ -7,4 +7,13 @@
     top: 0;
     left: 0;
   }
+  .annotations {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    tspan {
+      font-size: 12px;
+    }
+  }
 }

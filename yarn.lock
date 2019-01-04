@@ -3006,6 +3006,13 @@ d3-shape@1:
   dependencies:
     d3-path "1"
 
+d3-shape@~1.0.4:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/d3-shape/-/d3-shape-1.0.6.tgz#b09e305cf0c7c6b9a98c90e6b42f62dac4bcfd5b"
+  integrity sha1-sJ4wXPDHxrmpjJDmtC9i2sS8/Vs=
+  dependencies:
+    d3-path "1"
+
 d3-time-format@2:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/d3-time-format/-/d3-time-format-2.1.3.tgz#ae06f8e0126a9d60d6364eac5b1533ae1bac826b"
@@ -8267,7 +8274,7 @@ prompts@^0.1.9:
     kleur "^2.0.1"
     sisteransi "^0.1.1"
 
-prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.6.2:
+prop-types@15.6.2, prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.6.2:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.2.tgz#05d5ca77b4453e985d60fc7ff8c859094a497102"
   integrity sha512-3pboPvLiWD7dkI3qf3KbUe6hKFKa52w+AE0VCqECtf+QHAKgOL37tTaNCnuX1nAAQ4ZhyP+kYVKf8rLmJ/feDQ==
@@ -8438,6 +8445,14 @@ rc@^1.2.7:
     ini "~1.3.0"
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
+
+react-annotation@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/react-annotation/-/react-annotation-2.1.5.tgz#a063b77aaf0e0f0e6d2b273fe83375043a61b60f"
+  integrity sha512-OUel7AlqzcbCZqSS8gxsdb8EHxec/vTqwH7/cnhnCprcVeQprgUb923g/OcoPH6nzOPEms+AkqmMSo4KyLtGlw==
+  dependencies:
+    prop-types "15.6.2"
+    viz-annotation "0.0.3"
 
 react-app-polyfill@^0.2.0:
   version "0.2.0"
@@ -10258,6 +10273,13 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+viz-annotation@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/viz-annotation/-/viz-annotation-0.0.3.tgz#4186a31d5c483c7ab2bc8ca58f0193104b2bc6db"
+  integrity sha512-kkZ+mZHx+zfAZhBuA/PGzA7ZpKUZFjtgBqVcbPfCrOIrHjERcHyrNhxYfx1ZZu9uyZLO0i/qcoMOtY5HpavSlg==
+  dependencies:
+    d3-shape "~1.0.4"
 
 vm-browserify@0.0.4:
   version "0.0.4"

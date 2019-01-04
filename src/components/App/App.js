@@ -400,7 +400,7 @@ class App extends Component {
                 From a data perspective, many organizations and researchers have
                 developed a variety of metrics that can be used to better
                 understand a government’s individual impact. We will focus on
-                just a few.
+                three of these measurements.
               </p>
               <p>
                 The <strong>Human Development Index (HDI)</strong> combines

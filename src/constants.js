@@ -212,5 +212,11 @@ export const ANNOTATIONS = {
   ],
   "Haiti:hdi:gdp:local": [
     { year: 2010, text: "2010 Haiti earthquake.", dx: 0, dy: -90 }
+  ],
+  "Greece:hdi:gdp:local": [
+    { year: 2009, text: "Greek government debt crisis.", dx: -8, dy: 98 }
+  ],
+  "Jordan:hdi:gdp:local": [
+    { year: 2011, text: "Arab Spring protests.", dx: -9, dy: 58 }
   ]
 };

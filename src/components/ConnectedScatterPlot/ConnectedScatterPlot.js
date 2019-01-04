@@ -589,7 +589,7 @@ class ConnectedScatterPlot extends PureComponent {
           dy={a.dy}
           note={note}
           color={"black"}
-          editMode={true}
+          editMode={false}
           onDragEnd={p => console.log(p)}
         />
       );

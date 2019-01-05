@@ -27,3 +27,4 @@ yarn-error.log*
 .Rproj.user
 .DS_Store
 .Rhistory
+.RData

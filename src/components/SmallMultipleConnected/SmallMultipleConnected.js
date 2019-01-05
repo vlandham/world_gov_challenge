@@ -147,7 +147,7 @@ class SmallMultipleConnected extends Component {
           <ConnectedScatterPlot
             key={chartData.key}
             name={chartData.key}
-            data={chartData.values}
+            data={chartData.valuesFilter}
             xFunc={xFunc}
             yFunc={yFunc}
             zFunc={zFunc}

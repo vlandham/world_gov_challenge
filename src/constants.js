@@ -90,6 +90,7 @@ export const ANNOTATIONS = {
   'United Kingdom:hdi:gdp:local': [{ year: 2009, text: 'The Great Recession.', dx: -38, dy: -26 }],
   'United States:hdi:gdp:local': [{ year: 2009, text: 'The Great Recession.', dx: -27, dy: -9 }],
   'Sweden:hdi:gdp:local': [{ year: 2009, text: 'The Great Recession.', dx: -9, dy: -76 }],
+  'Canada:hdi:gdp:local': [{ year: 2009, text: 'The Great Recession.', dx: -16, dy: -24 }],
   'Libya:hdi:gdp:local': [{ year: 2011, text: 'First Libyan Civil War.', dx: 0, dy: -139 }],
   'Libya:hdi:gdp:global': [{ year: 2011, text: 'First Libyan Civil War.', dx: 70, dy: 50 }],
   'Iraq:hdi:gdp:local': [
@@ -217,5 +218,11 @@ export const ANNOTATIONS = {
   'Malawi:hdi:gdp:local': [{ year: 2002, text: 'Malawian food crisis.', dx: 22, dy: -113 }],
   'Central African Republic:hdi:gdp:local': [
     { year: 2012, text: 'Start of Civil War.', dx: -46, dy: -1 },
+  ],
+  'Burundi:hdi:gdp:local': [
+    { year: 2015, text: 'Protesting and Attempted coup.', dx: -69, dy: 14 },
+  ],
+  'Madagascar:hdi:gdp:local': [
+    { year: 2015, text: 'Ousting of president starts economic crisis.', dx: -87, dy: 4 },
   ],
 };

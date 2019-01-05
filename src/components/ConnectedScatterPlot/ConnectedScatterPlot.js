@@ -2,7 +2,8 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import addComputedProps from 'react-computed-props';
 import * as d3 from 'd3';
-import isfinite from 'lodash.isfinite';
+// import {Delaunay} from "d3-delaunay";
+
 import { AnnotationCalloutElbow } from 'react-annotation';
 import { floatingTooltip } from '../tooltip/tooltip';
 
@@ -36,7 +37,7 @@ function chartProps(props) {
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
 
-  const dataFiltered = data.filter(datum => isfinite(xFunc(datum)) && isfinite(yFunc(datum)));
+  // const dataFiltered = data.filter(datum => isfinite(xFunc(datum)) && isfinite(yFunc(datum)));
 
   xExtent = xExtent || d3.extent(data, xFunc);
   const xScale = d3
@@ -52,12 +53,6 @@ function chartProps(props) {
 
   const xValue = d => xScale(xFunc(d));
   const yValue = d => yScale(yFunc(d));
-
-  const line = d3
-    .line()
-    .x(xValue)
-    .y(yValue)
-    .curve(d3.curveCardinal.tension(0.3));
 
   const lineCanvas = d3
     .line()
@@ -78,17 +73,17 @@ function chartProps(props) {
       .voronoi()
       .x(d => xValue(d) + pixelJitter())
       .y(d => yValue(d) + pixelJitter())
-      .size([plotWidth, plotHeight])(dataFiltered);
+      .size([plotWidth, plotHeight])(data);
+
+    // voronoiDiagram = Delaunay.from(data, d => xValue(d) + pixelJitter(), d => yValue(d) + pixelJitter())
   }
 
   const mouseRadius = plotWidth / 3;
 
-  const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
-  const xAxis = d3.axisBottom(xScale).tickSizeOuter(0);
+  // const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
+  // const xAxis = d3.axisBottom(xScale).tickSizeOuter(0);
 
   return {
-    dataFiltered,
-    line,
     lineCanvas,
     padding,
     plotHeight,
@@ -102,8 +97,7 @@ function chartProps(props) {
     lineWidth,
     voronoiDiagram,
     mouseRadius,
-    xAxis,
-    yAxis,
+    // xAxis, yAxis,
     sizeScale,
   };
 }
@@ -299,38 +293,10 @@ class ConnectedScatterPlot extends PureComponent {
   /**
    *
    */
-  updateLine() {
-    const { dataFiltered, line, lineWidth } = this.props;
-    const lineBinding = this.chart.selectAll('.line').data([dataFiltered]);
-
-    const lineEnter = lineBinding
-      .enter()
-      .append('path')
-      .classed('line', true);
-
-    const lineMerged = lineEnter.merge(lineBinding);
-    lineMerged
-      .attr('fill', 'none')
-      .attr('stroke', '#888')
-      // .attr("stroke", "url(#svgGradient)")
-      .attr('stroke-width', lineWidth)
-      .attr('stroke-linejoin', 'round')
-      .attr('stroke-linecap', 'round')
-      .attr('pointer-events', 'none')
-      .attr('d', line);
-
-    lineBinding.exit().remove();
-  }
-
-  /**
-   *
-   */
   updateChart() {
-    const { dataFiltered, xValue, yValue, colorValue, radius } = this.props;
+    const { data, xValue, yValue, colorValue, radius } = this.props;
 
-    // this.updateLine();
-
-    const binding = this.chart.selectAll('.dot').data(dataFiltered, datum => datum.key);
+    const binding = this.chart.selectAll('.dot').data(data, datum => datum.key);
 
     const enter = binding
       .enter()
@@ -436,6 +402,7 @@ class ConnectedScatterPlot extends PureComponent {
    */
   updateCanvas() {
     const {
+      data,
       dataBackground,
       sizeScale,
       width,
@@ -444,7 +411,6 @@ class ConnectedScatterPlot extends PureComponent {
       lineWidth,
       scale,
       lineCanvas,
-      dataFiltered,
       colorValue,
       name,
     } = this.props;
@@ -464,6 +430,7 @@ class ConnectedScatterPlot extends PureComponent {
     ctx.clearRect(0, 0, width, height);
     // have some padding
     ctx.translate(padding.left, padding.top);
+
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = color.toString();
     dataBackground.forEach(country => {
@@ -475,9 +442,9 @@ class ConnectedScatterPlot extends PureComponent {
     });
 
     ctx.lineWidth = lineWidth;
-    for (let i = 0; i < dataFiltered.length - 1; i++) {
-      const segData = [dataFiltered[i], dataFiltered[i + 1]];
-      const segColor = colorValue(dataFiltered[i]);
+    for (let i = 0; i < data.length - 1; i++) {
+      const segData = [data[i], data[i + 1]];
+      const segColor = colorValue(data[i]);
       ctx.strokeStyle = segColor.toString();
       ctx.beginPath();
       lineCanvas(segData);
@@ -521,14 +488,14 @@ class ConnectedScatterPlot extends PureComponent {
    *
    */
   renderAnnotations() {
-    const { xValue, yValue, width, height, dataFiltered, annotations, padding } = this.props;
+    const { data, xValue, yValue, width, height, annotations, padding } = this.props;
 
     if (!annotations || annotations.length === 0) {
       return null;
     }
 
     const callouts = annotations.map(a => {
-      let yearData = dataFiltered.filter(d => d.year === a.year);
+      let yearData = data.filter(d => d.year === a.year);
 
       if (!yearData || yearData.length === 0) {
         return null;

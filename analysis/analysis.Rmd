@@ -357,11 +357,7 @@ So now this oddly named dataframe `ecfree_hdi_wb_data` includes columns from the
 
 **Normalization**
 
-Hastily, I added even more columns to the dataset for easier access. I also added a z-score normalized value and a min/max normalized value for many of the variables - to make them easier to compare. 
-
-```{r}
-range01 <- function(x){(x-min(x, na.rm = TRUE))/(max(x, na.rm = TRUE)-min(x, na.rm = TRUE))}
-```
+Hastily, I added even more columns to the dataset for easier access.
 
 
 ```{r}
@@ -379,21 +375,6 @@ ecfree_hdi_wb_data$gni_per_cap_percent <- ecfree_hdi_wb_data$NY.GNP.PCAP.KD.ZG
 ecfree_hdi_wb_data$gdp_per_cap <- ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD
 
 ecfree_hdi_wb_data$country_size <- ifelse(ecfree_hdi_wb_data$population > small_country_max_pop, 'big', 'little')
-
-# z-scores
-ecfree_hdi_wb_data$gdp_z <- scale(ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD, center = TRUE, scale = TRUE)
-ecfree_hdi_wb_data$gini_z <- scale(ecfree_hdi_wb_data$SI.POV.GINI, center = TRUE, scale = TRUE)
-ecfree_hdi_wb_data$hdi_z <- scale(ecfree_hdi_wb_data$hdi_value, center = TRUE, scale = TRUE)
-ecfree_hdi_wb_data$efree_z <- scale(ecfree_hdi_wb_data$`overall score`, center = TRUE, scale = TRUE)
-ecfree_hdi_wb_data$gni_z <- scale(ecfree_hdi_wb_data$gni_per_cap, center = TRUE, scale = TRUE)
-
-# min/max normalization
-ecfree_hdi_wb_data$gdp_01 <- range01(ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD)
-ecfree_hdi_wb_data$hdi_01 <- range01(ecfree_hdi_wb_data$hdi_value)
-ecfree_hdi_wb_data$efree_01 <- range01(ecfree_hdi_wb_data$`overall score`)
-ecfree_hdi_wb_data$gini_01 <- range01(ecfree_hdi_wb_data$SI.POV.GINI)
-ecfree_hdi_wb_data$gdp_log01 <- range01(log(ecfree_hdi_wb_data$NY.GDP.PCAP.PP.CD))
-ecfree_hdi_wb_data$gni_01 <- range01(ecfree_hdi_wb_data$gni_per_cap)
 ```
 
 ### Data Exploration 
@@ -553,7 +534,8 @@ ecfree_hdi_wb_data %>% filter(country %in% c('Brazil', 'China', 'United Kingdom'
   ggplot(aes( y = hdi, x = efree, colour = country)) + 
   geom_text(check_overlap = TRUE, aes(label = year)) + 
   geom_point() + 
-  geom_path()
+  geom_path() + 
+  labs(title="Connected Scatterplot: HDI vs Economic Freedom")
 ```
 
 Pretty nice! 
@@ -565,9 +547,38 @@ ecfree_hdi_wb_data  %>% arrange(country, year) %>%
   ggplot(aes( y = hdi, x = gdp_per_cap, group = country)) + 
   geom_text(check_overlap = TRUE, aes(label = year), alpha = 0.5) + 
   geom_point(alpha = 0.1) + 
-  geom_path(alpha = 0.1)
+  geom_path(alpha = 0.1) + 
+  labs(title="Connected Scatterplot: All HDI vs GDP")
 ```
 
+
+One other thing I wanted to see was how a country moved through this metric space relative to itself. How is a country performing compared to other years?
+
+That is where  normalization / scaling comes in handy!
+
+```{r}
+range01 <- function(x){(x-min(x, na.rm = TRUE))/(max(x, na.rm = TRUE)-min(x, na.rm = TRUE))}
+```
+
+
+```{r warning=FALSE}
+ecfree_hdi_wb_data <- ecfree_hdi_wb_data %>% 
+  group_by(country) %>% 
+  mutate(hdi_01 = range01(hdi), efree_01 = range01(efree), gdp_01 = range01(gdp_per_cap)) %>% 
+  ungroup()
+```
+
+
+```{r}
+ecfree_hdi_wb_data %>% filter(country %in% c('Brazil', 'China', 'United Kingdom', 'United States')) %>% arrange(country, year) %>%
+  ggplot(aes( y = hdi_01, x = gdp_01, colour = country)) + 
+  geom_text(check_overlap = TRUE, aes(label = year)) + 
+  geom_point() + 
+  geom_path() + 
+  labs(title="Connected Scatterplot: Relative HDI vs GDP")
+```
+
+Pretty fun to see an individuals arc, as well as a bit of comparison between 
 
 ### Saving to CSV
 
@@ -575,8 +586,12 @@ While this represents only a subset of the data exploration I did to get to the 
 
 To end, I saved a subset of our combined data to CSV to start digging in more with D3 in the main visualization piece. 
 
+
 ```{r}
 gov_data_save <- ecfree_hdi_wb_data %>% 
   select(country, iso3c, region, `sub-region`, year, population, gni_per_cap, gni_per_cap_percent, gdp_per_cap, efree, hdi, gini)
 write_csv(gov_data_save, "output/gov_data_year.csv")
 ```
+
+
+FIN 

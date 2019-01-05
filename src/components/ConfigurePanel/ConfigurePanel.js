@@ -1,14 +1,9 @@
-import React, { Component } from "react";
-import {
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem
-} from "reactstrap";
+import React, { Component } from 'react';
+import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
-import { CONFIGS } from "../../constants";
+import { CONFIGS } from '../../constants';
 
-import "./ConfigurePanel.scss";
+import './ConfigurePanel.scss';
 
 function indexOf(key, objs) {
   const keys = objs.map(o => o.id);
@@ -19,34 +14,29 @@ class ConfigurePanel extends Component {
   constructor(props) {
     super(props);
 
-    console.log(props);
-
     const { configs } = props;
 
     this.toggle = this.toggle.bind(this);
     this.click = this.click.bind(this);
 
-    const dataDisplayIndex = indexOf(
-      configs.dataDisplay,
-      CONFIGS.dataDisplay.options
-    );
+    const dataDisplayIndex = indexOf(configs.dataDisplay, CONFIGS.dataDisplay.options);
 
     this.state = {
       dataDisplay: {
         dropdownOpen: false,
         selectIndex: dataDisplayIndex,
-        selectedId: CONFIGS.dataDisplay.options[dataDisplayIndex].id
+        selectedId: CONFIGS.dataDisplay.options[dataDisplayIndex].id,
       },
       sortOrder: {
         dropdownOpen: false,
         selectIndex: 0,
-        selectedId: CONFIGS.sortOrder.options[0].id
+        selectedId: CONFIGS.sortOrder.options[0].id,
       },
       scale: {
         dropdownOpen: false,
         selectIndex: 0,
-        selectedId: CONFIGS.scale.options[0].id
-      }
+        selectedId: CONFIGS.scale.options[0].id,
+      },
     };
   }
 
@@ -56,10 +46,7 @@ class ConfigurePanel extends Component {
   componentDidUpdate() {
     const { configs } = this.props;
     const { dataDisplay } = this.state;
-    const dataDisplayIndex = indexOf(
-      configs.dataDisplay,
-      CONFIGS.dataDisplay.options
-    );
+    const dataDisplayIndex = indexOf(configs.dataDisplay, CONFIGS.dataDisplay.options);
 
     if (dataDisplayIndex !== dataDisplay.selectIndex) {
       dataDisplay.selectIndex = dataDisplayIndex;
@@ -94,10 +81,7 @@ class ConfigurePanel extends Component {
     const dropdownState = this.state[dropdownId];
     const data = CONFIGS[dropdownId];
     const items = data.options.map((d, index) => (
-      <DropdownItem
-        key={d.id}
-        onClick={this.click.bind(this, dropdownId, d, index)}
-      >
+      <DropdownItem key={d.id} onClick={this.click.bind(this, dropdownId, d, index)}>
         {d.label}
       </DropdownItem>
     ));
@@ -117,19 +101,14 @@ class ConfigurePanel extends Component {
 
   render() {
     const { size } = this.props;
-    if (size === "small") {
-      return (
-        <div className="ConfigurePanel">
-          Showing {this.renderDropdown("dataDisplay")}
-        </div>
-      );
+    if (size === 'small') {
+      return <div className="ConfigurePanel">Showing {this.renderDropdown('dataDisplay')}</div>;
     }
 
     return (
       <div className="ConfigurePanel">
-        Showing {this.renderDropdown("dataDisplay")} sorted{" "}
-        {this.renderDropdown("sortOrder")} using a{" "}
-        {this.renderDropdown("scale")} scale.
+        Showing {this.renderDropdown('dataDisplay')} sorted {this.renderDropdown('sortOrder')} using
+        a {this.renderDropdown('scale')} scale.
       </div>
     );
   }

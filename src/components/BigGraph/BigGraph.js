@@ -1,18 +1,18 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import addComputedProps from "react-computed-props";
-import AutoWidth from "../AutoWidth/AutoWidth";
-import ConnectedScatterPlotGroups from "../ConnectedScatterPlotGroups/ConnectedScatterPlotGroups";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import addComputedProps from 'react-computed-props';
+import AutoWidth from '../AutoWidth/AutoWidth';
+import ConnectedScatterPlotGroups from '../ConnectedScatterPlotGroups/ConnectedScatterPlotGroups';
 
-import { tableContent } from "../tooltip/tooltip";
-import { formatNumber } from "../../utils/format";
-import { METRICS, EXTENT } from "../../constants";
+import { tableContent } from '../tooltip/tooltip';
+import { formatNumber } from '../../utils/format';
+import { METRICS, EXTENT } from '../../constants';
 
 function chartProps(props) {
   const { xMetric, yMetric } = props;
-  const scale = "global";
+  const scale = 'global';
 
-  const zMetric = "year";
+  const zMetric = 'year';
   const xLabel = METRICS[xMetric].label;
   const yLabel = METRICS[yMetric].label;
   const zLabel = METRICS[zMetric].label;
@@ -23,11 +23,12 @@ function chartProps(props) {
   const tooltipTextFunc = d => {
     const tooltipData = {
       [xLabel]: d[METRICS[xMetric].display],
-      [yLabel]: d[METRICS[yMetric].display]
+      [yLabel]: d[METRICS[yMetric].display],
+      Population: d.population,
     };
     return tableContent(tooltipData, {
       title: `${d.country} - ${d.year}`,
-      valueFormat: formatNumber
+      valueFormat: formatNumber,
     });
   };
 
@@ -39,7 +40,7 @@ function chartProps(props) {
     xFunc,
     yFunc,
     zFunc,
-    tooltipTextFunc
+    tooltipTextFunc,
   };
 }
 
@@ -47,15 +48,15 @@ class BigGraph extends Component {
   static propTypes = {
     dataGrouped: PropTypes.array,
     scale: PropTypes.string,
-    colorScale: PropTypes.func
+    colorScale: PropTypes.func,
   };
 
   static defaultProps = {
     dataGrouped: [],
-    xMetric: "hdi",
-    yMetric: "gni",
-    scale: "global",
-    colorScale: d => "#333"
+    xMetric: 'hdi',
+    yMetric: 'gni',
+    scale: 'global',
+    colorScale: d => '#333',
   };
 
   /**
@@ -74,7 +75,7 @@ class BigGraph extends Component {
       zFunc,
       xMetric,
       yMetric,
-      tooltipTextFunc
+      tooltipTextFunc,
     } = this.props;
 
     return (

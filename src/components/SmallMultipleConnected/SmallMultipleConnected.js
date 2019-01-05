@@ -1,19 +1,19 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import addComputedProps from "react-computed-props";
-import { Row, Col } from "reactstrap";
-import * as d3 from "d3";
-import ConnectedScatterPlot from "../ConnectedScatterPlot/ConnectedScatterPlot";
-import isfinite from "lodash.isfinite";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import addComputedProps from 'react-computed-props';
+import { Row, Col } from 'reactstrap';
+import * as d3 from 'd3';
+import ConnectedScatterPlot from '../ConnectedScatterPlot/ConnectedScatterPlot';
+import isfinite from 'lodash.isfinite';
 
-import ColorLegend from "../ColorLegend/ColorLegend";
-import { tableContent } from "../tooltip/tooltip";
-import { formatNumber } from "../../utils/format";
+import ColorLegend from '../ColorLegend/ColorLegend';
+import { tableContent } from '../tooltip/tooltip';
+import { formatNumber } from '../../utils/format';
 
-import "./SmallMultipleConnected.scss";
-import AutoWidth from "../AutoWidth/AutoWidth";
+import './SmallMultipleConnected.scss';
+import AutoWidth from '../AutoWidth/AutoWidth';
 
-import { METRICS, EXTENT, ANNOTATIONS } from "../../constants";
+import { METRICS, EXTENT, ANNOTATIONS } from '../../constants';
 
 /**
  *
@@ -25,14 +25,11 @@ import { METRICS, EXTENT, ANNOTATIONS } from "../../constants";
  */
 function sortData(data, sortOrder, xFunc, yFunc, zFunc) {
   if (METRICS[sortOrder]) {
-    const direction = sortOrder === "gini" ? "ascending" : "descending";
+    const direction = sortOrder === 'gini' ? 'ascending' : 'descending';
     data = data.sort((x, y) =>
-      d3[direction](
-        x[METRICS[sortOrder].sortable],
-        y[METRICS[sortOrder].sortable]
-      )
+      d3[direction](x[METRICS[sortOrder].sortable], y[METRICS[sortOrder].sortable]),
     );
-  } else if (sortOrder === "region") {
+  } else if (sortOrder === 'region') {
     data = data.sort((x, y) => d3.ascending(x.region, y.region));
   } else {
     data = data.sort((x, y) => d3.ascending(x.key, y.key));
@@ -66,7 +63,7 @@ function chartProps(props) {
   const { xMetric, yMetric, scale, sortOrder } = props;
   let { dataGrouped } = props;
 
-  const zMetric = "year";
+  const zMetric = 'year';
   const xLabel = METRICS[xMetric].label;
   const yLabel = METRICS[yMetric].label;
   const zLabel = METRICS[zMetric].label;
@@ -86,11 +83,12 @@ function chartProps(props) {
   const tooltipTextFunc = d => {
     const tooltipData = {
       [xLabel]: d[METRICS[xMetric].display],
-      [yLabel]: d[METRICS[yMetric].display]
+      [yLabel]: d[METRICS[yMetric].display],
+      Population: d.population,
     };
     return tableContent(tooltipData, {
       title: `${d.year}`,
-      valueFormat: formatNumber
+      valueFormat: formatNumber,
     });
   };
 
@@ -102,7 +100,7 @@ function chartProps(props) {
     xFunc,
     yFunc,
     zFunc,
-    tooltipTextFunc
+    tooltipTextFunc,
   };
 }
 
@@ -114,15 +112,15 @@ class SmallMultipleConnected extends Component {
     dataGrouped: PropTypes.array,
     scale: PropTypes.string,
     sortOrder: PropTypes.string,
-    colorScale: PropTypes.func
+    colorScale: PropTypes.func,
   };
 
   static defaultProps = {
     dataGrouped: [],
-    xMetric: "hdi",
-    yMetric: "gni",
-    scale: "global",
-    colorScale: d => "#333"
+    xMetric: 'hdi',
+    yMetric: 'gni',
+    scale: 'global',
+    colorScale: d => '#333',
   };
 
   renderChart(chartData, chartIndex) {
@@ -138,13 +136,13 @@ class SmallMultipleConnected extends Component {
       yMetric,
       scale,
       colorScale,
-      dataGrouped
+      dataGrouped,
     } = this.props;
 
     const annotationKey = `${chartData.key}:${yMetric}:${xMetric}:${scale}`;
     const annotations = ANNOTATIONS[annotationKey];
     return (
-      <Col sm={4} key={chartData.key}>
+      <Col sm={12} md={6} lg={4} key={chartData.key}>
         <AutoWidth>
           <ConnectedScatterPlot
             key={chartData.key}
@@ -174,7 +172,7 @@ class SmallMultipleConnected extends Component {
   renderRegion(chartData, index) {
     const { sortOrder, dataGrouped } = this.props;
     const region = chartData.region;
-    if (sortOrder === "region") {
+    if (sortOrder === 'region') {
       if (index === 0) {
         return (
           <Col sm={12} key={region}>
@@ -218,12 +216,7 @@ class SmallMultipleConnected extends Component {
           </Col>
           <Col sm={6}>{this.renderLegend()}</Col>
         </Row>
-        <Row>
-          {dataGrouped.map((d, i) => [
-            this.renderRegion(d, i),
-            this.renderChart(d, i)
-          ])}
-        </Row>
+        <Row>{dataGrouped.map((d, i) => [this.renderRegion(d, i), this.renderChart(d, i)])}</Row>
       </div>
     );
   }

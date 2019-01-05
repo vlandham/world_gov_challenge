@@ -1,31 +1,22 @@
-import React, { PureComponent } from "react";
-import PropTypes from "prop-types";
-import addComputedProps from "react-computed-props";
-import isfinite from "lodash.isfinite";
-import * as d3 from "d3";
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import addComputedProps from 'react-computed-props';
+import isfinite from 'lodash.isfinite';
+import * as d3 from 'd3';
 
-import { includesAny } from "../../utils/collection";
-import { floatingTooltip } from "../tooltip/tooltip";
+import { includesAny } from '../../utils/collection';
+import { floatingTooltip } from '../tooltip/tooltip';
 
-import "./ScatterPlot.scss";
+import './ScatterPlot.scss';
 
 function chartProps(props) {
-  const {
-    data,
-    height,
-    width,
-    xFunc,
-    yFunc,
-    colorByFunc,
-    colorScale,
-    exactMouse
-  } = props;
+  const { data, height, width, xFunc, yFunc, colorByFunc, colorScale, exactMouse } = props;
 
   const padding = {
     top: 20,
     right: 20,
     bottom: 50,
-    left: 60
+    left: 60,
   };
 
   const plotWidth = width - padding.left - padding.right;
@@ -47,8 +38,7 @@ function chartProps(props) {
 
   const xValue = d => xScale(xFunc(d));
   const yValue = d => yScale(yFunc(d));
-  const colorValue = d =>
-    colorByFunc(d) ? colorScale(colorByFunc(d)) : "#888";
+  const colorValue = d => (colorByFunc(d) ? colorScale(colorByFunc(d)) : '#888');
 
   const yAxis = d3
     .axisLeft(yScale)
@@ -84,7 +74,7 @@ function chartProps(props) {
     xAxis,
     yAxis,
     voronoiDiagram,
-    mouseRadius
+    mouseRadius,
   };
 }
 
@@ -143,7 +133,7 @@ class ScatterPlot extends PureComponent {
      * Values being hovered on.
      */
     hoverData: PropTypes.shape({
-      values: PropTypes.array
+      values: PropTypes.array,
     }),
 
     /**
@@ -172,7 +162,7 @@ class ScatterPlot extends PureComponent {
      * Values selected.
      */
     selectedData: PropTypes.shape({
-      values: PropTypes.array
+      values: PropTypes.array,
     }),
 
     /**
@@ -210,13 +200,13 @@ class ScatterPlot extends PureComponent {
      * Boolean controlling if chart is zoomable or not.
      * @default true
      */
-    zoomable: PropTypes.bool
+    zoomable: PropTypes.bool,
   };
 
   static defaultProps = {
     data: [],
     labels: {},
-    name: "scatter",
+    name: 'scatter',
     brushable: true,
     colorByFunc: () => {},
     height: 400,
@@ -224,14 +214,14 @@ class ScatterPlot extends PureComponent {
     selectedData: null,
     width: 300,
     onFilter: () => {},
-    colorScale: () => "#ddd",
+    colorScale: () => '#ddd',
     xFunc: d => d.x,
     yFunc: d => d.y,
     radius: 4,
-    xLabel: "",
-    yLabel: "",
+    xLabel: '',
+    yLabel: '',
     zoomable: false,
-    exactMouse: false
+    exactMouse: false,
   };
 
   /**
@@ -242,7 +232,7 @@ class ScatterPlot extends PureComponent {
 
     this.state = {
       zooming: false,
-      showTable: false
+      showTable: false,
     };
 
     this.handleLassoSelect = this.handleLassoSelect.bind(this);
@@ -299,9 +289,9 @@ class ScatterPlot extends PureComponent {
     this.highlightCircle(null);
 
     this.chart
-      .selectAll(".dot")
-      .attr("cx", xValue)
-      .attr("cy", yValue);
+      .selectAll('.dot')
+      .attr('cx', xValue)
+      .attr('cy', yValue);
   }
 
   /**
@@ -310,7 +300,7 @@ class ScatterPlot extends PureComponent {
   handleZoomingToggle() {
     const { zooming } = this.state;
     this.setState({
-      zooming: !zooming
+      zooming: !zooming,
     });
   }
 
@@ -318,33 +308,26 @@ class ScatterPlot extends PureComponent {
    *
    */
   highlightCircle(d) {
-    const {
-      xFunc,
-      yFunc,
-      colorScale,
-      colorBy,
-      tooltipTextFunc,
-      onHover
-    } = this.props;
+    const { xFunc, yFunc, colorScale, colorBy, tooltipTextFunc, onHover } = this.props;
     let { xScale, yScale } = this.props;
 
     xScale = this.zoomTransform.rescaleX(xScale);
     yScale = this.zoomTransform.rescaleY(yScale);
 
     if (!d) {
-      this.highlight.style("display", "none");
+      this.highlight.style('display', 'none');
       this.tooltip.hideTooltip();
-      this.annotation.attr("opacity", 1.0);
+      this.annotation.attr('opacity', 1.0);
     } else {
       this.highlight
-        .style("display", "")
-        .style("stroke", colorScale(d[colorBy]))
-        .attr("cx", xScale(xFunc(d)))
-        .attr("cy", yScale(yFunc(d)));
+        .style('display', '')
+        .style('stroke', colorScale(d[colorBy]))
+        .attr('cx', xScale(xFunc(d)))
+        .attr('cy', yScale(yFunc(d)));
       if (tooltipTextFunc) {
         this.tooltip.showTooltip(tooltipTextFunc(d), d3.event);
       }
-      this.annotation.attr("opacity", 0.3);
+      this.annotation.attr('opacity', 0.3);
     }
 
     if (onHover) {
@@ -392,54 +375,54 @@ class ScatterPlot extends PureComponent {
     const { plotHeight, plotWidth, radius, exactMouse } = this.props;
     const cRoot = d3.select(this.root);
 
-    this.g = cRoot.append("g");
+    this.g = cRoot.append('g');
 
     this.underlay = this.g
-      .append("rect")
-      .classed("underlay", true)
-      .attr("width", plotWidth)
-      .attr("height", plotHeight)
-      .style("fill", "white");
+      .append('rect')
+      .classed('underlay', true)
+      .attr('width', plotWidth)
+      .attr('height', plotHeight)
+      .style('fill', 'white');
 
     const that = this;
     if (!exactMouse) {
       this.underlay
-        .on("mousemove", function(d) {
+        .on('mousemove', function(d) {
           that.handleMouseOver(this, d);
         })
-        .on("mouseleave", function() {
+        .on('mouseleave', function() {
           that.handleMouseOut();
         });
     }
 
     this.setupZoom(this.underlay);
 
-    this.chart = this.g.append("g").classed("chart-group", true);
-    this.tooltip = floatingTooltip("_tooltip", { xOffset: 5, yOffset: 20 });
+    this.chart = this.g.append('g').classed('chart-group', true);
+    this.tooltip = floatingTooltip('scatter_tooltip', { xOffset: 5, yOffset: 20 });
 
     this.highlight = this.g
-      .append("circle")
-      .attr("class", "highlight-circle")
-      .attr("r", radius * 2)
-      .style("fill", "none")
-      .style("display", "none");
+      .append('circle')
+      .attr('class', 'highlight-circle')
+      .attr('r', radius * 2)
+      .style('fill', 'none')
+      .style('display', 'none');
 
     this.annotation = this.g
-      .append("g")
-      .classed("annotation", true)
-      .attr("pointer-events", "none");
+      .append('g')
+      .classed('annotation', true)
+      .attr('pointer-events', 'none');
 
-    this.xAxis = this.g.append("g").classed("x-axis", true);
-    this.yAxis = this.g.append("g").classed("y-axis", true);
+    this.xAxis = this.g.append('g').classed('x-axis', true);
+    this.yAxis = this.g.append('g').classed('y-axis', true);
     this.yAxisLabel = this.g
-      .append("text")
-      .attr("class", "axis-label")
-      .attr("text-anchor", "middle");
+      .append('text')
+      .attr('class', 'axis-label')
+      .attr('text-anchor', 'middle');
 
     this.xAxisLabel = this.g
-      .append("text")
-      .attr("class", "axis-label")
-      .attr("text-anchor", "middle");
+      .append('text')
+      .attr('class', 'axis-label')
+      .attr('text-anchor', 'middle');
 
     this.update();
   }
@@ -455,7 +438,7 @@ class ScatterPlot extends PureComponent {
       this.zoom = d3
         .zoom()
         .scaleExtent([1 / 4, 8])
-        .on("zoom", this.handleZoom);
+        .on('zoom', this.handleZoom);
 
       underlay.call(this.zoom);
     }
@@ -466,11 +449,21 @@ class ScatterPlot extends PureComponent {
    */
   update() {
     const { padding } = this.props;
-    this.g.attr("transform", `translate(${padding.left} ${padding.top})`);
+    this.g.attr('transform', `translate(${padding.left} ${padding.top})`);
 
+    this.updateLayout();
     this.updateChart();
     this.updateAnnotation();
     this.updateAxes();
+  }
+
+  /**
+   *
+   */
+  updateLayout() {
+    const { plotHeight, plotWidth } = this.props;
+
+    this.underlay.attr('width', plotWidth).attr('height', plotHeight);
   }
 
   updateAnnotation() {
@@ -485,24 +478,20 @@ class ScatterPlot extends PureComponent {
     const xValue = d => xScale(xFunc(d));
     const yValue = d => yScale(yFunc(d));
 
-    const binding = this.annotation
-      .selectAll(".label")
-      .data(labelData, d => d.country);
+    const binding = this.annotation.selectAll('.label').data(labelData, d => d.country);
 
     const enter = binding
       .enter()
-      .append("text")
-      .classed("label", true);
+      .append('text')
+      .classed('label', true);
     const merged = enter.merge(binding);
 
     merged
-      .attr("x", xValue)
-      .attr("y", d => yValue(d))
-      .attr("dy", d => (labels[d.country].position === "below" ? 15 : 3))
-      .attr("dx", d => (labels[d.country].position === "below" ? null : 8))
-      .attr("text-anchor", d =>
-        labels[d.country].position === "below" ? "middle" : "start"
-      )
+      .attr('x', xValue)
+      .attr('y', d => yValue(d))
+      .attr('dy', d => (labels[d.country].position === 'below' ? 15 : 3))
+      .attr('dx', d => (labels[d.country].position === 'below' ? null : 8))
+      .attr('text-anchor', d => (labels[d.country].position === 'below' ? 'middle' : 'start'))
       .text(d => d.country);
   }
 
@@ -518,7 +507,7 @@ class ScatterPlot extends PureComponent {
       yFunc,
       colorValue,
       radius,
-      exactMouse
+      exactMouse,
     } = this.props;
 
     let { xScale, yScale } = this.props;
@@ -530,63 +519,57 @@ class ScatterPlot extends PureComponent {
     const yValue = d => yScale(yFunc(d));
 
     const binding = this.chart
-      .selectAll(".dot")
+      .selectAll('.dot')
       .data(
         data.filter(datum => isfinite(xFunc(datum)) && isfinite(yFunc(datum))),
-        datum => datum.key
+        datum => datum.key,
       );
 
     const enter = binding
       .enter()
-      .append("circle")
-      .classed("dot", true);
+      .append('circle')
+      .classed('dot', true);
 
     const merged = enter.merge(binding);
 
     merged
-      .attr("cx", xValue)
-      .attr("cy", yValue)
-      .attr("r", radius)
-      .attr("fill", colorValue);
+      .attr('cx', xValue)
+      .attr('cy', yValue)
+      .attr('r', radius)
+      .attr('fill', colorValue);
 
     if (exactMouse) {
-      merged
-        .on("mouseover", this.handleMouseOverCircle)
-        .on("mouseout", this.handleMouseOutCircle);
+      merged.on('mouseover', this.handleMouseOverCircle).on('mouseout', this.handleMouseOutCircle);
     } else {
-      merged.style("pointer-events", "none");
+      merged.style('pointer-events', 'none');
     }
 
     merged
-      .classed("highlight", false)
-      .classed("dim", false)
-      .classed("selected", false);
+      .classed('highlight', false)
+      .classed('dim', false)
+      .classed('selected', false);
 
     if (hoverData && hoverData.values.length > 0) {
       const hoverFilter = d => hoverData.values.includes(d.key);
 
       merged
-        .classed("highlight", false)
-        .classed("dim", true)
+        .classed('highlight', false)
+        .classed('dim', true)
         .filter(hoverFilter)
-        .classed("highlight", true)
-        .classed("dim", false)
-        .attr("r", radius * 1.5)
+        .classed('highlight', true)
+        .classed('dim', false)
+        .attr('r', radius * 1.5)
         .raise()
         .filter(hoverFilter)
-        .classed("selected", true)
+        .classed('selected', true)
         .raise();
     }
 
     if (selectedData && selectedData.values && selectedData.values.length > 0) {
       merged
-        .filter(
-          d =>
-            d[selectedData.key] &&
-            includesAny(d[selectedData.key], selectedData.values)
-        )
-        .classed("highlight", true)
-        .classed("dim", false)
+        .filter(d => d[selectedData.key] && includesAny(d[selectedData.key], selectedData.values))
+        .classed('highlight', true)
+        .classed('dim', false)
         .raise();
     }
 
@@ -597,40 +580,25 @@ class ScatterPlot extends PureComponent {
    *
    */
   updateAxes() {
-    const {
-      xAxis,
-      yAxis,
-      xLabel,
-      yLabel,
-      plotHeight,
-      plotWidth,
-      padding
-    } = this.props;
+    const { xAxis, yAxis, xLabel, yLabel, plotHeight, plotWidth, padding } = this.props;
 
     let { xScale, yScale } = this.props;
 
     xScale = this.zoomTransform.rescaleX(xScale);
     yScale = this.zoomTransform.rescaleY(yScale);
 
-    this.xAxis
-      .attr("transform", `translate(${0}, ${plotHeight})`)
-      .call(xAxis.scale(xScale));
+    this.xAxis.attr('transform', `translate(${0}, ${plotHeight})`).call(xAxis.scale(xScale));
 
     this.yAxis.call(yAxis.scale(yScale));
 
     this.yAxisLabel
-      .attr(
-        "transform",
-        `rotate(270) translate(${-plotHeight / 2} ${-padding.left + 18})`
-      )
+      .attr('transform', `rotate(270) translate(${-plotHeight / 2} ${-padding.left + 18})`)
       .text(yLabel);
 
     this.xAxisLabel
       .attr(
-        "transform",
-        `translate(${plotWidth / 2} ${plotHeight +
-          padding.top +
-          padding.bottom / 3})`
+        'transform',
+        `translate(${plotWidth / 2} ${plotHeight + padding.top + padding.bottom / 3})`,
       )
       .text(xLabel);
   }

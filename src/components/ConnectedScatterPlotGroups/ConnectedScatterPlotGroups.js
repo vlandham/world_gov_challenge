@@ -1,11 +1,11 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import addComputedProps from "react-computed-props";
-import * as d3 from "d3";
-import isfinite from "lodash.isfinite";
-import { floatingTooltip } from "../tooltip/tooltip";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import addComputedProps from 'react-computed-props';
+import * as d3 from 'd3';
+import isfinite from 'lodash.isfinite';
+import { floatingTooltip } from '../tooltip/tooltip';
 
-import "./ConnectedScatterPlotGroups.scss";
+import './ConnectedScatterPlotGroups.scss';
 
 function isHoverEqual(a, b) {
   if (!a && !b) {
@@ -27,16 +27,7 @@ function isHoverEqual(a, b) {
  * @param {*} props
  */
 function chartProps(props) {
-  const {
-    dataBackground,
-    xFunc,
-    yFunc,
-    zFunc,
-    colorScale,
-    height,
-    width,
-    scale
-  } = props;
+  const { dataBackground, xFunc, yFunc, zFunc, colorScale, height, width, scale } = props;
 
   let { xExtent, yExtent } = props;
 
@@ -46,7 +37,7 @@ function chartProps(props) {
     top: 20,
     right: 20,
     bottom: 40,
-    left: 40
+    left: 40,
   };
 
   // scaling for retina displays
@@ -55,8 +46,8 @@ function chartProps(props) {
     sizeScale = window.devicePixelRatio;
   }
 
-  const radius = scale === "local" ? 5 : 2;
-  const lineWidth = scale === "local" ? 3 : 1;
+  const radius = scale === 'local' ? 5 : 2;
+  const lineWidth = scale === 'local' ? 3 : 1;
 
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
@@ -65,7 +56,7 @@ function chartProps(props) {
 
   dataBackground.forEach(country => {
     country.valuesFilter = country.values.filter(
-      datum => isfinite(xFunc(datum)) && isfinite(yFunc(datum))
+      datum => isfinite(xFunc(datum)) && isfinite(yFunc(datum)),
     );
 
     if (country.valuesFilter.length > threshold) {
@@ -124,7 +115,7 @@ function chartProps(props) {
   // .curve(d3.curveNatural);
   // .curve(d3.curveCardinal.tension(0.3));
 
-  let colorValue = d => "#ddd";
+  let colorValue = d => '#ddd';
   if (colorScale) {
     colorValue = d => colorScale(zFunc(d));
   }
@@ -160,7 +151,7 @@ function chartProps(props) {
     mouseRadius,
     xAxis,
     yAxis,
-    sizeScale
+    sizeScale,
   };
 }
 
@@ -181,7 +172,7 @@ class ConnectedScatterPlotGroups extends Component {
     yExtent: PropTypes.array,
     width: PropTypes.number,
     height: PropTypes.number,
-    tooltipTextFunc: PropTypes.func
+    tooltipTextFunc: PropTypes.func,
   };
 
   static defaultProps = {
@@ -189,13 +180,13 @@ class ConnectedScatterPlotGroups extends Component {
     radius: 4,
     height: 300,
     width: 300,
-    name: "",
+    name: '',
     xFunc: d => d.x,
     yFunc: d => d.x,
-    xLabel: "",
-    yLabel: "",
-    tooltipTextFunc: d => "",
-    colorScale: () => "#ddd"
+    xLabel: '',
+    yLabel: '',
+    tooltipTextFunc: d => '',
+    colorScale: () => '#ddd',
   };
 
   /**
@@ -247,14 +238,7 @@ class ConnectedScatterPlotGroups extends Component {
    *
    */
   highlightCircle(d) {
-    const {
-      xFunc,
-      yFunc,
-      colorScale,
-      colorBy,
-      tooltipTextFunc,
-      onHover
-    } = this.props;
+    const { xFunc, yFunc, colorScale, colorBy, tooltipTextFunc, onHover } = this.props;
 
     let { xScale, yScale } = this.props;
     const { hover } = this.state;
@@ -263,14 +247,14 @@ class ConnectedScatterPlotGroups extends Component {
     yScale = this.zoomTransform.rescaleY(yScale);
 
     if (!d) {
-      this.highlight.style("display", "none");
+      this.highlight.style('display', 'none');
       this.tooltip.hideTooltip();
     } else {
       this.highlight
-        .style("display", "")
-        .style("stroke", colorScale(d[colorBy]))
-        .attr("cx", xScale(xFunc(d)))
-        .attr("cy", yScale(yFunc(d)));
+        .style('display', '')
+        .style('stroke', colorScale(d[colorBy]))
+        .attr('cx', xScale(xFunc(d)))
+        .attr('cy', yScale(yFunc(d)));
       if (tooltipTextFunc) {
         this.tooltip.showTooltip(tooltipTextFunc(d), d3.event);
       }
@@ -295,60 +279,60 @@ class ConnectedScatterPlotGroups extends Component {
 
     const cRoot = d3.select(this.root);
 
-    this.g = cRoot.append("g");
+    this.g = cRoot.append('g');
 
     const that = this;
     this.underlay = this.g
-      .append("rect")
-      .classed("underlay", true)
-      .attr("width", plotWidth)
-      .attr("height", plotHeight)
-      .style("fill", "white")
-      .style("opacity", 0.0001)
-      .on("mousemove", function(d) {
+      .append('rect')
+      .classed('underlay', true)
+      .attr('width', plotWidth)
+      .attr('height', plotHeight)
+      .style('fill', 'white')
+      .style('opacity', 0.0001)
+      .on('mousemove', function(d) {
         that.handleMouseover(this, d);
       })
-      .on("mouseleave", function() {
+      .on('mouseleave', function() {
         that.handleMouseout();
       });
-    this.chart = this.g.append("g").classed("chart-group", true);
-    this.tooltip = floatingTooltip("_tooltip", { xOffset: 15, yOffset: 40 });
+    this.chart = this.g.append('g').classed('chart-group', true);
+    this.tooltip = floatingTooltip('grouped_tooltip', { xOffset: 15, yOffset: 40 });
 
     this.highlight = this.g
-      .append("circle")
-      .attr("class", "highlight-circle")
-      .attr("r", radius + 2)
-      .style("fill", "none")
-      .style("pointer-events", "none")
-      .style("display", "none");
+      .append('circle')
+      .attr('class', 'highlight-circle')
+      .attr('r', radius + 2)
+      .style('fill', 'none')
+      .style('pointer-events', 'none')
+      .style('display', 'none');
 
     this.xAxis = this.g
-      .append("g")
-      .classed("x-axis", true)
-      .style("pointer-events", "none");
+      .append('g')
+      .classed('x-axis', true)
+      .style('pointer-events', 'none');
 
-    this.xAxis.append("line").classed("bar", true);
-    this.xAxis.append("text").classed("low", true);
-    this.xAxis.append("text").classed("high", true);
+    this.xAxis.append('line').classed('bar', true);
+    this.xAxis.append('text').classed('low', true);
+    this.xAxis.append('text').classed('high', true);
 
     this.yAxis = this.g
-      .append("g")
-      .classed("y-axis", true)
-      .style("pointer-events", "none");
+      .append('g')
+      .classed('y-axis', true)
+      .style('pointer-events', 'none');
 
-    this.yAxis.append("line").classed("bar", true);
-    this.yAxis.append("text").classed("low", true);
-    this.yAxis.append("text").classed("high", true);
+    this.yAxis.append('line').classed('bar', true);
+    this.yAxis.append('text').classed('low', true);
+    this.yAxis.append('text').classed('high', true);
 
     this.yAxisLabel = this.g
-      .append("text")
-      .attr("class", "axis-label")
-      .attr("text-anchor", "middle");
+      .append('text')
+      .attr('class', 'axis-label')
+      .attr('text-anchor', 'middle');
 
     this.xAxisLabel = this.g
-      .append("text")
-      .attr("class", "axis-label")
-      .attr("text-anchor", "middle");
+      .append('text')
+      .attr('class', 'axis-label')
+      .attr('text-anchor', 'middle');
 
     this.update();
   }
@@ -358,103 +342,97 @@ class ConnectedScatterPlotGroups extends Component {
    */
   update() {
     const { padding } = this.props;
-    this.g.attr("transform", `translate(${padding.left} ${padding.top})`);
+    this.g.attr('transform', `translate(${padding.left} ${padding.top})`);
 
+    this.updateLayout();
     this.updateAxes();
     this.updateCanvas();
   }
 
+  /**
+   *
+   */
+  updateLayout() {
+    const { plotHeight, plotWidth } = this.props;
+
+    this.underlay.attr('width', plotWidth).attr('height', plotHeight);
+  }
+
   updateAxes() {
-    const {
-      xMetric,
-      yMetric,
-      xLabel,
-      yLabel,
-      plotHeight,
-      plotWidth,
-      padding
-    } = this.props;
+    const { xMetric, yMetric, xLabel, yLabel, plotHeight, plotWidth, padding } = this.props;
 
-    this.xAxis.attr("transform", `translate(${0}, ${plotHeight})`);
-    this.xAxis.attr("font-size", 10).attr("fill", "none");
-    this.yAxis.attr("font-size", 10).attr("fill", "none");
+    this.xAxis.attr('transform', `translate(${0}, ${plotHeight})`);
+    this.xAxis.attr('font-size', 10).attr('fill', 'none');
+    this.yAxis.attr('font-size', 10).attr('fill', 'none');
 
-    const xLowText = xMetric === "gini" ? "more equal" : "low";
-    const xHighText = xMetric === "gini" ? "less equal" : "high";
+    const xLowText = xMetric === 'gini' ? 'more equal' : 'low';
+    const xHighText = xMetric === 'gini' ? 'less equal' : 'high';
 
-    const yLowText = yMetric === "gini" ? "more equal" : "low";
-    const yHighText = yMetric === "gini" ? "less equal" : "high";
+    const yLowText = yMetric === 'gini' ? 'more equal' : 'low';
+    const yHighText = yMetric === 'gini' ? 'less equal' : 'high';
 
     this.xAxis
-      .select(".bar")
-      .attr("x1", 0)
-      .attr("x2", plotWidth)
-      .attr("y1", 0)
-      .attr("y2", 0)
-      .style("stroke-width", 1)
-      .style("stroke", "black")
-      .style("fill", "none");
+      .select('.bar')
+      .attr('x1', 0)
+      .attr('x2', plotWidth)
+      .attr('y1', 0)
+      .attr('y2', 0)
+      .style('stroke-width', 1)
+      .style('stroke', 'black')
+      .style('fill', 'none');
 
     this.xAxis
-      .select(".low")
-      .attr("y", 9)
-      .attr("fill", "#333")
-      .attr("dy", "0.6em")
+      .select('.low')
+      .attr('y', 9)
+      .attr('fill', '#333')
+      .attr('dy', '0.6em')
       .text(xLowText);
 
     this.xAxis
-      .select(".high")
-      .attr("y", 9)
-      .attr("x", plotWidth)
-      .attr("text-anchor", "end")
-      .attr("fill", "#333")
-      .attr("dy", "0.6em")
+      .select('.high')
+      .attr('y', 9)
+      .attr('x', plotWidth)
+      .attr('text-anchor', 'end')
+      .attr('fill', '#333')
+      .attr('dy', '0.6em')
       .text(xHighText);
 
     this.yAxis
-      .select(".bar")
-      .attr("x1", 0)
-      .attr("x2", 0)
-      .attr("y1", 0)
-      .attr("y2", plotHeight)
-      .style("stroke-width", 1)
-      .style("stroke", "black")
-      .style("fill", "none");
+      .select('.bar')
+      .attr('x1', 0)
+      .attr('x2', 0)
+      .attr('y1', 0)
+      .attr('y2', plotHeight)
+      .style('stroke-width', 1)
+      .style('stroke', 'black')
+      .style('fill', 'none');
 
     this.yAxis
-      .select(".low")
-      .attr("y", 9)
-      .attr("fill", "#333")
-      .attr("dy", "0.6em")
-      .attr(
-        "transform",
-        `rotate(270) translate(${-plotHeight} ${-padding.left + 18})`
-      )
+      .select('.low')
+      .attr('y', 9)
+      .attr('fill', '#333')
+      .attr('dy', '0.6em')
+      .attr('transform', `rotate(270) translate(${-plotHeight} ${-padding.left + 18})`)
       .text(yLowText);
 
     this.yAxis
-      .select(".high")
-      .attr("y", 9)
-      .attr("x", 0)
-      .attr("text-anchor", "end")
-      .attr("fill", "#333")
-      .attr("dy", "0.6em")
-      .attr("transform", `rotate(270) translate(${0} ${-padding.left + 18})`)
+      .select('.high')
+      .attr('y', 9)
+      .attr('x', 0)
+      .attr('text-anchor', 'end')
+      .attr('fill', '#333')
+      .attr('dy', '0.6em')
+      .attr('transform', `rotate(270) translate(${0} ${-padding.left + 18})`)
       .text(yHighText);
 
     this.yAxisLabel
-      .attr(
-        "transform",
-        `rotate(270) translate(${-plotHeight / 2} ${-padding.left + 18})`
-      )
+      .attr('transform', `rotate(270) translate(${-plotHeight / 2} ${-padding.left + 18})`)
       .text(yLabel);
 
     this.xAxisLabel
       .attr(
-        "transform",
-        `translate(${plotWidth / 2} ${plotHeight +
-          padding.top +
-          padding.bottom / 3})`
+        'transform',
+        `translate(${plotWidth / 2} ${plotHeight + padding.top + padding.bottom / 3})`,
       )
       .text(xLabel);
   }
@@ -476,13 +454,13 @@ class ConnectedScatterPlotGroups extends Component {
       yValue,
       radius,
       colorValue,
-      threshold
+      threshold,
     } = this.props;
 
     const { hover } = this.state;
 
     // get context
-    const ctx = this.canvas.getContext("2d");
+    const ctx = this.canvas.getContext('2d');
 
     lineCanvas.context(ctx);
 
@@ -495,8 +473,8 @@ class ConnectedScatterPlotGroups extends Component {
     ctx.translate(padding.left, padding.top);
     ctx.lineWidth = lineWidth;
 
-    let lineColor = d3.color("#ccc");
-    lineColor.opacity = scale === "global" ? 0.8 : 0.15;
+    let lineColor = d3.color('#ccc');
+    lineColor.opacity = scale === 'global' ? 0.8 : 0.15;
     ctx.strokeStyle = lineColor.toString();
 
     let hoverCountry = null;
@@ -512,10 +490,7 @@ class ConnectedScatterPlotGroups extends Component {
           ctx.stroke();
         } else {
           for (let i = 0; i < country.valuesFilter.length - 1; i++) {
-            const segData = [
-              country.valuesFilter[i],
-              country.valuesFilter[i + 1]
-            ];
+            const segData = [country.valuesFilter[i], country.valuesFilter[i + 1]];
             const segColor = colorValue(country.valuesFilter[i]);
             ctx.strokeStyle = segColor.toString();
             ctx.beginPath();
@@ -537,12 +512,12 @@ class ConnectedScatterPlotGroups extends Component {
       }
     });
 
-    lineColor = d3.color("#888");
-    lineColor.opacity = scale === "global" ? 0.8 : 0.15;
+    lineColor = d3.color('#888');
+    lineColor.opacity = scale === 'global' ? 0.8 : 0.15;
     ctx.strokeStyle = lineColor.toString();
 
     if (hoverCountry) {
-      lineColor = d3.color("white");
+      lineColor = d3.color('white');
       lineColor.opacity = 0.8;
       ctx.lineWidth = lineWidth * 5;
       ctx.strokeStyle = lineColor.toString();
@@ -552,18 +527,15 @@ class ConnectedScatterPlotGroups extends Component {
       ctx.stroke();
 
       ctx.lineWidth = lineWidth;
-      lineColor = d3.color("#888");
-      lineColor.opacity = scale === "global" ? 0.8 : 0.15;
+      lineColor = d3.color('#888');
+      lineColor.opacity = scale === 'global' ? 0.8 : 0.15;
       ctx.strokeStyle = lineColor.toString();
       ctx.beginPath();
       lineCanvas(hoverCountry.valuesFilter);
       ctx.stroke();
 
       for (let i = 0; i < hoverCountry.valuesFilter.length - 1; i++) {
-        const segData = [
-          hoverCountry.valuesFilter[i],
-          hoverCountry.valuesFilter[i + 1]
-        ];
+        const segData = [hoverCountry.valuesFilter[i], hoverCountry.valuesFilter[i + 1]];
         const segColor = colorValue(hoverCountry.valuesFilter[i]);
         ctx.strokeStyle = segColor.toString();
         ctx.beginPath();
@@ -594,28 +566,21 @@ class ConnectedScatterPlotGroups extends Component {
       plotWidth,
       padding,
       xScale,
-      yScale
+      yScale,
     } = this.props;
 
-    this.xAxis
-      .attr("transform", `translate(${0}, ${plotHeight})`)
-      .call(xAxis.scale(xScale));
+    this.xAxis.attr('transform', `translate(${0}, ${plotHeight})`).call(xAxis.scale(xScale));
 
     this.yAxis.call(yAxis.scale(yScale));
 
     this.yAxisLabel
-      .attr(
-        "transform",
-        `rotate(270) translate(${-plotHeight / 2} ${-padding.left + 18})`
-      )
+      .attr('transform', `rotate(270) translate(${-plotHeight / 2} ${-padding.left + 18})`)
       .text(yLabel);
 
     this.xAxisLabel
       .attr(
-        "transform",
-        `translate(${plotWidth / 2} ${plotHeight +
-          padding.top +
-          padding.bottom / 3})`
+        'transform',
+        `translate(${plotWidth / 2} ${plotHeight + padding.top + padding.bottom / 3})`,
       )
       .text(xLabel);
   }
@@ -628,7 +593,7 @@ class ConnectedScatterPlotGroups extends Component {
 
     let canvasStyle = {
       width: width,
-      height: height
+      height: height,
     };
 
     return (
@@ -659,13 +624,5 @@ class ConnectedScatterPlotGroups extends Component {
 }
 
 export default addComputedProps(chartProps, {
-  changeInclude: [
-    "dataBackground",
-    "scale",
-    "sortOrder",
-    "width",
-    "height",
-    "xMetric",
-    "yMetric"
-  ]
+  changeInclude: ['dataBackground', 'scale', 'sortOrder', 'width', 'height', 'xMetric', 'yMetric'],
 })(ConnectedScatterPlotGroups);

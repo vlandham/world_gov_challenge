@@ -237,7 +237,7 @@ class ConnectedScatterPlot extends PureComponent {
         that.handleMouseout();
       });
     this.chart = this.g.append('g').classed('chart-group', true);
-    this.tooltip = floatingTooltip('_tooltip', { xOffset: 5, yOffset: 20 });
+    this.tooltip = floatingTooltip('connected_tooltip', { xOffset: 5, yOffset: 20 });
 
     this.highlight = this.g
       .append('circle')
@@ -285,9 +285,19 @@ class ConnectedScatterPlot extends PureComponent {
     const { padding } = this.props;
     this.g.attr('transform', `translate(${padding.left} ${padding.top})`);
 
-    this.updateChart();
+    // this.updateChart();
+    this.updateLayout();
     this.updateAxes();
     this.updateCanvas();
+  }
+
+  /**
+   *
+   */
+  updateLayout() {
+    const { plotHeight, plotWidth } = this.props;
+
+    this.underlay.attr('width', plotWidth).attr('height', plotHeight);
   }
 
   /**
@@ -310,6 +320,8 @@ class ConnectedScatterPlot extends PureComponent {
       .attr('cy', yValue)
       .attr('r', radius)
       .attr('fill', colorValue);
+    // .attr('stroke', 'red')
+    // .attr('stroke-width', 2);
     merged.style('pointer-events', 'none');
 
     binding.exit().remove();
@@ -412,6 +424,9 @@ class ConnectedScatterPlot extends PureComponent {
       scale,
       lineCanvas,
       colorValue,
+      xValue,
+      yValue,
+      radius,
       name,
     } = this.props;
 
@@ -450,6 +465,14 @@ class ConnectedScatterPlot extends PureComponent {
       lineCanvas(segData);
       ctx.stroke();
     }
+
+    data.forEach(year => {
+      let dotColor = colorValue(year);
+      ctx.beginPath();
+      ctx.arc(xValue(year), yValue(year), radius, 0, 2 * Math.PI, false);
+      ctx.fillStyle = dotColor.toString();
+      ctx.fill();
+    });
   }
 
   /**

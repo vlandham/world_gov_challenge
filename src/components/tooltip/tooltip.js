@@ -1,5 +1,5 @@
-import * as d3 from "d3";
-import "./tooltip.scss";
+import * as d3 from 'd3';
+import './tooltip.scss';
 
 /**
  * Format an object into a table for tooltip output.
@@ -19,25 +19,23 @@ export function tableContent(entries, config = {}) {
     title: null,
     keys: null,
     keyFormat: k => k,
-    valueFormat: v => v
+    valueFormat: v => v,
   };
   config = { ...defaultConfig, ...config };
   config.keys = config.keys || Object.keys(entries);
-  let output = "<div>";
+  let output = '<div>';
   if (config.title) {
     output += `<h2>${config.title}</h2>`;
   }
-  output += "<table><tbody>";
+  output += '<table><tbody>';
   const rows = config.keys.map(k => {
     if (k in entries) {
-      return `<tr><td>${config.keyFormat(k)}</td><td>${config.valueFormat(
-        entries[k]
-      )}</td></tr>`;
+      return `<tr><td>${config.keyFormat(k)}</td><td>${config.valueFormat(entries[k])}</td></tr>`;
     }
-    return "";
+    return '';
   });
-  output += rows.join("");
-  output += "</tbody></table></div>";
+  output += rows.join('');
+  output += '</tbody></table></div>';
   return output;
 }
 
@@ -49,12 +47,10 @@ export function tableContent(entries, config = {}) {
  */
 export function spanContent(entries) {
   const content = Object.keys(entries).map(k => {
-    return `<span class='name'>${k}: </span><span class='value'>${
-      entries[k]
-    }</span>`;
+    return `<span class='name'>${k}: </span><span class='value'>${entries[k]}</span>`;
   });
 
-  return content.join("<br/>");
+  return content.join('<br/>');
 }
 
 /*
@@ -63,22 +59,25 @@ export function spanContent(entries) {
  * Most styling is expected to come from CSS
  * so check out bubble_chart.scss for more details.
  */
-export function floatingTooltip(
-  tooltipId,
-  config = { xOffset: 35, yOffset: -60, width: null }
-) {
+export function floatingTooltip(tooltipId, config = { xOffset: 35, yOffset: -60, width: null }) {
   // Local variable to hold tooltip div for
   // manipulation in other functions.
-  var tt = d3
-    .select("body")
-    .append("div")
-    .attr("class", "tooltip")
-    .attr("id", tooltipId)
-    .html("");
+  const base = d3.select('body');
+
+  let tt = base.select(`#${tooltipId}`);
+
+  if (tt.empty()) {
+    base
+      .append('div')
+      .attr('class', 'tooltip')
+      .attr('id', tooltipId);
+    tt = base.select(`#${tooltipId}`);
+  }
+  tt.html('');
 
   // Set a width if it is provided.
   if (config.width) {
-    tt.style("width", config.width);
+    tt.style('width', config.width);
   }
 
   // Initially it is hidden.
@@ -92,8 +91,8 @@ export function floatingTooltip(
    * event is d3.event for positioning.
    */
   function showTooltip(content, event) {
-    tt.style("opacity", 1.0)
-      .style("pointer-events", "all")
+    tt.style('opacity', 1.0)
+      .style('pointer-events', 'all')
       .html(content);
 
     updatePosition(event);
@@ -103,11 +102,11 @@ export function floatingTooltip(
    * Hide the tooltip div.
    */
   function hideTooltip() {
-    tt.style("opacity", 0.0).style("pointer-events", "none");
+    tt.style('opacity', 0.0).style('pointer-events', 'none');
   }
 
   function toNum(str) {
-    return Number(str.replace(/[^\d.-]/g, ""));
+    return Number(str.replace(/[^\d.-]/g, ''));
   }
 
   /*
@@ -118,8 +117,8 @@ export function floatingTooltip(
     var xOffset = config.xOffset;
     var yOffset = config.yOffset;
 
-    var ttw = toNum(tt.style("width"));
-    var tth = toNum(tt.style("height"));
+    var ttw = toNum(tt.style('width'));
+    var tth = toNum(tt.style('height'));
 
     var wscrY = window.scrollY;
     var wscrX = window.scrollX;
@@ -127,9 +126,7 @@ export function floatingTooltip(
     var curX = document.all ? event.clientX + wscrX : event.pageX;
     var curY = document.all ? event.clientY + wscrY : event.pageY;
     var ttleft =
-      curX - wscrX + xOffset * 2 + ttw > window.innerWidth
-        ? curX - ttw - xOffset
-        : curX + xOffset;
+      curX - wscrX + xOffset * 2 + ttw > window.innerWidth ? curX - ttw - xOffset : curX + xOffset;
 
     if (ttleft < wscrX + xOffset) {
       ttleft = wscrX + xOffset;
@@ -144,12 +141,12 @@ export function floatingTooltip(
       tttop = curY + yOffset;
     }
 
-    tt.style("top", tttop + "px").style("left", ttleft + "px");
+    tt.style('top', tttop + 'px').style('left', ttleft + 'px');
   }
 
   return {
     showTooltip: showTooltip,
     hideTooltip: hideTooltip,
-    updatePosition: updatePosition
+    updatePosition: updatePosition,
   };
 }

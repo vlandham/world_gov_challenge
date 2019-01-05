@@ -10,9 +10,9 @@ import { METRICS, SCATTER_LABELS } from '../../constants';
 import SmallMultipleConnected from '../SmallMultipleConnected/SmallMultipleConnected';
 import ConfigurePanel from '../ConfigurePanel/ConfigurePanel';
 import ColorLegend from '../ColorLegend/ColorLegend';
+import BigGraph from '../BigGraph/BigGraph';
 
 import './App.scss';
-import BigGraph from '../BigGraph/BigGraph';
 
 /**
  *

@@ -6,6 +6,8 @@ import * as d3 from 'd3';
 import ConnectedScatterPlot from '../ConnectedScatterPlot/ConnectedScatterPlot';
 import isfinite from 'lodash.isfinite';
 
+import { isMobile, MobileView } from 'react-device-detect';
+
 import ColorLegend from '../ColorLegend/ColorLegend';
 import { tableContent } from '../tooltip/tooltip';
 import { formatNumber } from '../../utils/format';
@@ -46,13 +48,42 @@ function sortData(data, sortOrder, xFunc, yFunc, zFunc) {
  * @param {*} yFunc
  */
 function filterData(data, threshold, xFunc, yFunc) {
-  return data.filter(country => {
+  return data.filter((country, index) => {
     country.valuesFilter = country.values.filter(year => {
       return isfinite(xFunc(year)) && isfinite(yFunc(year));
     });
 
-    return country.valuesFilter.length > threshold;
+    const keep = country.valuesFilter.length > threshold;
+    return keep;
   });
+}
+
+/**
+ *
+ * @param {*} data
+ * @param {*} sortOrder
+ */
+function limitData(data, sortOrder) {
+  const regionCounts = d3.map();
+  const filtered = data.filter((c, index) => {
+    let keep = true;
+    if (sortOrder === 'region') {
+      const region = c.region;
+      if (!regionCounts.has(region)) {
+        regionCounts.set(region, 0);
+      }
+
+      const regionCount = regionCounts.get(region);
+
+      regionCounts.set(region, regionCount + 1);
+      keep = regionCount < 6;
+    } else {
+      keep = index < 20;
+    }
+    return keep;
+  });
+
+  return filtered;
 }
 
 /**
@@ -75,6 +106,10 @@ function chartProps(props) {
   dataGrouped = filterData(dataGrouped, 3, xFunc, yFunc);
 
   dataGrouped = sortData(dataGrouped, sortOrder, xFunc, yFunc, zFunc);
+
+  if (isMobile) {
+    dataGrouped = limitData(dataGrouped, sortOrder);
+  }
 
   // var colorScale = d3
   //   .scaleSequential(d3.interpolatePlasma)
@@ -123,6 +158,9 @@ class SmallMultipleConnected extends Component {
     colorScale: d => '#333',
   };
 
+  /**
+   *
+   */
   renderChart(chartData, chartIndex) {
     const {
       xFunc,
@@ -169,6 +207,11 @@ class SmallMultipleConnected extends Component {
     );
   }
 
+  /**
+   *
+   * @param {*} chartData
+   * @param {*} index
+   */
   renderRegion(chartData, index) {
     const { sortOrder, dataGrouped } = this.props;
     const region = chartData.region;
@@ -212,11 +255,13 @@ class SmallMultipleConnected extends Component {
           <Col sm={6}>
             <span className="align-middle">
               Data from 2000 to 2017 for {dataGrouped.length} countries.
+              <MobileView>Explore all countries on a desktop browser.</MobileView>
             </span>
           </Col>
           <Col sm={6}>{this.renderLegend()}</Col>
         </Row>
         <Row>{dataGrouped.map((d, i) => [this.renderRegion(d, i), this.renderChart(d, i)])}</Row>
+        <MobileView>Explore all countries on a desktop browser.</MobileView>
       </div>
     );
   }

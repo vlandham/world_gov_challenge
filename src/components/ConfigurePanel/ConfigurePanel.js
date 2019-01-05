@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactGA from 'react-ga';
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 import { CONFIGS } from '../../constants';
@@ -61,6 +62,11 @@ class ConfigurePanel extends Component {
       data.dropdownOpen = !data.dropdownOpen;
       return { [dropdownId]: data };
     });
+
+    ReactGA.event({
+      category: `${dropdownId}-toggled`,
+      action: dropdownId,
+    });
   }
 
   click(dropdownId, option, optionIndex) {
@@ -70,6 +76,11 @@ class ConfigurePanel extends Component {
       data.selectIndex = optionIndex;
       data.selectedId = option.id;
       return { [dropdownId]: data };
+    });
+
+    ReactGA.event({
+      category: `${dropdownId}-clicked`,
+      action: option.id,
     });
 
     if (onClick) {

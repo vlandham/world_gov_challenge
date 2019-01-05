@@ -1,13 +1,13 @@
 {
-  "main.css": "/world_gov_challenge/static/css/main.624807ed.chunk.css",
-  "main.js": "/world_gov_challenge/static/js/main.9749133c.chunk.js",
-  "main.js.map": "/world_gov_challenge/static/js/main.9749133c.chunk.js.map",
-  "static/js/1.1a96c62f.chunk.js": "/world_gov_challenge/static/js/1.1a96c62f.chunk.js",
-  "static/js/1.1a96c62f.chunk.js.map": "/world_gov_challenge/static/js/1.1a96c62f.chunk.js.map",
+  "main.css": "/world_gov_challenge/static/css/main.deb75baf.chunk.css",
+  "main.js": "/world_gov_challenge/static/js/main.883d6369.chunk.js",
+  "main.js.map": "/world_gov_challenge/static/js/main.883d6369.chunk.js.map",
+  "static/js/1.aed369f4.chunk.js": "/world_gov_challenge/static/js/1.aed369f4.chunk.js",
+  "static/js/1.aed369f4.chunk.js.map": "/world_gov_challenge/static/js/1.aed369f4.chunk.js.map",
   "runtime~main.js": "/world_gov_challenge/static/js/runtime~main.79cc8ce2.js",
   "runtime~main.js.map": "/world_gov_challenge/static/js/runtime~main.79cc8ce2.js.map",
-  "static/css/main.624807ed.chunk.css.map": "/world_gov_challenge/static/css/main.624807ed.chunk.css.map",
+  "static/css/main.deb75baf.chunk.css.map": "/world_gov_challenge/static/css/main.deb75baf.chunk.css.map",
   "index.html": "/world_gov_challenge/index.html",
-  "precache-manifest.115dea89591234348d77f866f419f2d9.js": "/world_gov_challenge/precache-manifest.115dea89591234348d77f866f419f2d9.js",
+  "precache-manifest.b0a672aff0e3860981a2e3cdb59412ec.js": "/world_gov_challenge/precache-manifest.b0a672aff0e3860981a2e3cdb59412ec.js",
   "service-worker.js": "/world_gov_challenge/service-worker.js"
 }

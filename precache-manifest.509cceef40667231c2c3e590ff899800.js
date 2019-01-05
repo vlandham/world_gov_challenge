@@ -4,19 +4,19 @@ self.__precacheManifest = [
     "url": "/world_gov_challenge/static/js/runtime~main.79cc8ce2.js"
   },
   {
-    "revision": "c02a664bdfad454dd561",
-    "url": "/world_gov_challenge/static/js/main.c02a664b.chunk.js"
+    "revision": "ce1c980bf2fa87582def",
+    "url": "/world_gov_challenge/static/js/main.ce1c980b.chunk.js"
   },
   {
     "revision": "34aff46b1db129a68b07",
     "url": "/world_gov_challenge/static/js/1.34aff46b.chunk.js"
   },
   {
-    "revision": "c02a664bdfad454dd561",
+    "revision": "ce1c980bf2fa87582def",
     "url": "/world_gov_challenge/static/css/main.deb75baf.chunk.css"
   },
   {
-    "revision": "cb6a5cd516cf157ea9a72eeaa728af87",
+    "revision": "23f59ccc246b60f215e9beb43f2a008e",
     "url": "/world_gov_challenge/index.html"
   }
 ];

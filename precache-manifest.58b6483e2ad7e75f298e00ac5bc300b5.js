@@ -4,15 +4,15 @@ self.__precacheManifest = [
     "url": "/world_gov_challenge/static/js/runtime~main.79cc8ce2.js"
   },
   {
-    "revision": "f33af0ebf583e1fba556",
-    "url": "/world_gov_challenge/static/js/main.f33af0eb.chunk.js"
+    "revision": "9df9888fded2b4f8fd2f",
+    "url": "/world_gov_challenge/static/js/main.9df9888f.chunk.js"
   },
   {
     "revision": "9c902c51fef95915aa19",
     "url": "/world_gov_challenge/static/js/1.9c902c51.chunk.js"
   },
   {
-    "revision": "f33af0ebf583e1fba556",
+    "revision": "9df9888fded2b4f8fd2f",
     "url": "/world_gov_challenge/static/css/main.bc1b8347.chunk.css"
   },
   {
@@ -20,7 +20,7 @@ self.__precacheManifest = [
     "url": "/world_gov_challenge/static/css/1.9070bf1e.chunk.css"
   },
   {
-    "revision": "0070aafa566a1617116d9461a962f8fc",
+    "revision": "19823eb747ed680e6ad1b39eebefe36a",
     "url": "/world_gov_challenge/index.html"
   }
 ];

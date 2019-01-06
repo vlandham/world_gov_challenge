@@ -134,7 +134,7 @@ class App extends Component {
       search: [],
       configs: {
         dataDisplay: 'hdi_gdp',
-        sortOrder: 'region',
+        sortOrder: 'hdi',
         scale: 'local',
       },
       colorScale: d3.scaleSequential(d3.interpolateOranges).domain([1990, 2020]),

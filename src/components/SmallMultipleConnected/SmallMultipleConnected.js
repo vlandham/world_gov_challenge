@@ -11,9 +11,10 @@ import { isMobile, MobileView } from 'react-device-detect';
 import ColorLegend from '../ColorLegend/ColorLegend';
 import { tableContent } from '../tooltip/tooltip';
 import { formatNumber } from '../../utils/format';
+import AutoWidth from '../AutoWidth/AutoWidth';
+import Search from '../Search/Search';
 
 import './SmallMultipleConnected.scss';
-import AutoWidth from '../AutoWidth/AutoWidth';
 
 import { METRICS, EXTENT, ANNOTATIONS } from '../../constants';
 
@@ -25,7 +26,7 @@ import { METRICS, EXTENT, ANNOTATIONS } from '../../constants';
  * @param {*} yFunc
  * @param {*} zFunc
  */
-function sortData(data, sortOrder, xFunc, yFunc, zFunc) {
+function sortData(data, sortOrder) {
   if (METRICS[sortOrder]) {
     const direction = sortOrder === 'gini' ? 'ascending' : 'descending';
     data = data.sort((x, y) =>
@@ -55,6 +56,16 @@ function filterData(data, threshold, xFunc, yFunc) {
 
     const keep = country.valuesFilter.length > threshold;
     return keep;
+  });
+}
+
+function filterSearch(data, search) {
+  if (!search || search.length === 0) {
+    return data;
+  }
+  const searchKeys = search.map(s => s.key);
+  return data.filter(country => {
+    return searchKeys.includes(country.key);
   });
 }
 
@@ -91,7 +102,7 @@ function limitData(data, sortOrder) {
  * @param {*} props
  */
 function chartProps(props) {
-  const { xMetric, yMetric, scale, sortOrder } = props;
+  const { xMetric, yMetric, scale, sortOrder, search } = props;
   let { dataGrouped } = props;
 
   const zMetric = 'year';
@@ -104,6 +115,8 @@ function chartProps(props) {
   const zFunc = d => d[METRICS[zMetric].display];
 
   dataGrouped = filterData(dataGrouped, 3, xFunc, yFunc);
+  const searchKeys = dataGrouped.map(d => ({ key: d.key }));
+  dataGrouped = filterSearch(dataGrouped, search);
 
   dataGrouped = sortData(dataGrouped, sortOrder, xFunc, yFunc, zFunc);
 
@@ -129,6 +142,7 @@ function chartProps(props) {
 
   return {
     dataGrouped,
+    searchKeys,
     xLabel,
     yLabel,
     zLabel,
@@ -244,6 +258,11 @@ class SmallMultipleConnected extends Component {
     return <ColorLegend colorScale={colorScale} domain={[2001, 2017]} />;
   }
 
+  renderSearch() {
+    const { searchKeys, search, onSearchChange } = this.props;
+    return <Search onChange={onSearchChange} data={searchKeys} selected={search} />;
+  }
+
   /**
    *
    */
@@ -252,16 +271,18 @@ class SmallMultipleConnected extends Component {
     return (
       <div className="SmallMultipleConnected">
         <Row>
-          <Col sm={6}>
+          <Col sm={12} lg={7} className="search-section">
+            {this.renderSearch()}
             <span className="align-middle">
               Data from 2000 to 2017 for {dataGrouped.length} countries.
               <MobileView>Explore all countries on a desktop browser.</MobileView>
             </span>
           </Col>
-          <Col sm={6}>{this.renderLegend()}</Col>
+          <Col sm={12} lg={5}>
+            {this.renderLegend()}
+          </Col>
         </Row>
-        <Row>
-          <div className="blank-small" />
+        <Row className="regions">
           {dataGrouped.map((d, i) => [this.renderRegion(d, i), this.renderChart(d, i)])}
         </Row>
         <MobileView>Explore all countries on a desktop browser.</MobileView>

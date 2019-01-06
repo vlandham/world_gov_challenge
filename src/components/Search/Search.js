@@ -18,7 +18,7 @@ class Search extends Component {
   }
 
   handleChange(selected) {
-    this.onChange(selected);
+    this.props.onChange(selected);
   }
 
   /**
@@ -36,7 +36,8 @@ class Search extends Component {
           clearButton={true}
           multiple={true}
           minLength={2}
-          placeholder="Highlight a country..."
+          onChange={this.handleChange}
+          placeholder="Filter countries..."
         />
       </div>
     );

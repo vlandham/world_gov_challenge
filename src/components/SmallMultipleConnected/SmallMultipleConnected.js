@@ -114,19 +114,21 @@ function chartProps(props) {
   const yFunc = d => d[METRICS[yMetric][scale]];
   const zFunc = d => d[METRICS[zMetric].display];
 
+  // filter data so that countries with minimum years don't get in
   dataGrouped = filterData(dataGrouped, 3, xFunc, yFunc);
+
+  // create search list from that grouped data
   const searchKeys = dataGrouped.map(d => ({ key: d.key }));
-  dataGrouped = filterSearch(dataGrouped, search);
+
+  // filtered data is data with filters applied.
+  let dataFiltered = filterSearch(dataGrouped, search);
 
   dataGrouped = sortData(dataGrouped, sortOrder, xFunc, yFunc, zFunc);
+  dataFiltered = sortData(dataFiltered, sortOrder, xFunc, yFunc, zFunc);
 
   if (isMobile) {
-    dataGrouped = limitData(dataGrouped, sortOrder);
+    dataFiltered = limitData(dataGrouped, sortOrder);
   }
-
-  // var colorScale = d3
-  //   .scaleSequential(d3.interpolatePlasma)
-  //   .domain([2020, 1995]);
 
   const tooltipTextFunc = d => {
     const tooltipData = {
@@ -141,6 +143,7 @@ function chartProps(props) {
   };
 
   return {
+    dataFiltered,
     dataGrouped,
     searchKeys,
     xLabel,
@@ -166,6 +169,7 @@ class SmallMultipleConnected extends Component {
 
   static defaultProps = {
     dataGrouped: [],
+    dataFiltered: [],
     xMetric: 'hdi',
     yMetric: 'gni',
     scale: 'global',
@@ -227,7 +231,7 @@ class SmallMultipleConnected extends Component {
    * @param {*} index
    */
   renderRegion(chartData, index) {
-    const { sortOrder, dataGrouped } = this.props;
+    const { sortOrder, dataFiltered } = this.props;
     const region = chartData.region;
     if (sortOrder === 'region') {
       if (index === 0) {
@@ -237,7 +241,7 @@ class SmallMultipleConnected extends Component {
           </Col>
         );
       } else {
-        const preRegion = dataGrouped[index - 1].region;
+        const preRegion = dataFiltered[index - 1].region;
         if (region !== preRegion) {
           return (
             <Col key={region} sm={12}>
@@ -267,14 +271,14 @@ class SmallMultipleConnected extends Component {
    *
    */
   render() {
-    const { dataGrouped } = this.props;
+    const { dataFiltered } = this.props;
     return (
       <div className="SmallMultipleConnected">
         <Row>
           <Col sm={12} lg={7} className="search-section">
             {this.renderSearch()}
             <span className="align-middle">
-              Data from 2000 to 2017 for {dataGrouped.length} countries.
+              Data from 2000 to 2017 for {dataFiltered.length} countries.
               <MobileView>Explore all countries on a desktop browser.</MobileView>
             </span>
           </Col>
@@ -283,7 +287,7 @@ class SmallMultipleConnected extends Component {
           </Col>
         </Row>
         <Row className="regions">
-          {dataGrouped.map((d, i) => [this.renderRegion(d, i), this.renderChart(d, i)])}
+          {dataFiltered.map((d, i) => [this.renderRegion(d, i), this.renderChart(d, i)])}
         </Row>
         <MobileView>Explore all countries on a desktop browser.</MobileView>
       </div>

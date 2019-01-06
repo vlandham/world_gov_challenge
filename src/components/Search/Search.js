@@ -22,8 +22,8 @@ class Search extends Component {
     const label = selected.length === 0 ? 'clear' : selected.map(s => s.key).join('_');
 
     ReactGA.event({
-      category: 'search',
-      action: 'search-change',
+      category: 'search-change',
+      action: label,
       label: label,
     });
     this.props.onChange(selected);

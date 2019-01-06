@@ -64,8 +64,9 @@ class ConfigurePanel extends Component {
     });
 
     ReactGA.event({
-      category: `${dropdownId}-toggled`,
-      action: dropdownId,
+      category: 'dropdown',
+      action: `${dropdownId}-toggle`,
+      label: dropdownId,
     });
   }
 
@@ -79,8 +80,9 @@ class ConfigurePanel extends Component {
     });
 
     ReactGA.event({
-      category: `${dropdownId}-clicked`,
-      action: option.id,
+      category: 'dropdown',
+      action: `${option.id}-click`,
+      label: option.id,
     });
 
     if (onClick) {

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactGA from 'react-ga';
 import { Typeahead } from 'react-bootstrap-typeahead';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
@@ -18,6 +19,13 @@ class Search extends Component {
   }
 
   handleChange(selected) {
+    const label = selected.length === 0 ? 'clear' : selected.map(s => s.key).join('_');
+
+    ReactGA.event({
+      category: 'search',
+      action: 'search-change',
+      label: label,
+    });
     this.props.onChange(selected);
   }
 

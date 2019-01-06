@@ -446,7 +446,7 @@ class ConnectedScatterPlot extends PureComponent {
     // have some padding
     ctx.translate(padding.left, padding.top);
 
-    ctx.lineWidth = lineWidth;
+    ctx.lineWidth = scale === 'global' ? lineWidth : lineWidth * 0.5;
     ctx.strokeStyle = color.toString();
     dataBackground.forEach(country => {
       if (country.key !== name) {

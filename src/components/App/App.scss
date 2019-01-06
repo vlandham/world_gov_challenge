@@ -32,7 +32,12 @@
   .blank {
     width: 100px;
     margin-top: 20px;
-    padding-bottom: 40px;
+    padding-bottom: 60px;
+  }
+  .blank-small {
+    width: 100px;
+    margin-top: 0px;
+    padding-bottom: 20px;
   }
   h1,
   h2,
@@ -44,5 +49,8 @@
   .footer {
     margin-top: 30px;
     padding-bottom: 20px;
+  }
+  .config-small {
+    margin-left: 40px;
   }
 }

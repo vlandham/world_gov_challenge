@@ -295,7 +295,11 @@ class App extends Component {
    */
   renderConfigPanel(size = null) {
     const { configs } = this.state;
-    return <ConfigurePanel configs={configs} size={size} onClick={this.handleConfigClick} />;
+    return (
+      <div className={`config-${size}`}>
+        <ConfigurePanel configs={configs} size={size} onClick={this.handleConfigClick} />
+      </div>
+    );
   }
 
   /**

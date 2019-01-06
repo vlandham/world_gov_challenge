@@ -13,6 +13,7 @@ import ColorLegend from '../ColorLegend/ColorLegend';
 import BigGraph from '../BigGraph/BigGraph';
 
 import './App.scss';
+import Search from '../Search/Search';
 
 /**
  *
@@ -131,6 +132,7 @@ class App extends Component {
       dataGrouped: [],
       focusYear: 2017,
       scatterHover: null,
+      search: null,
       configs: {
         dataDisplay: 'hdi_gdp',
         sortOrder: 'region',
@@ -141,6 +143,7 @@ class App extends Component {
 
     this.handleScatterHover = this.handleScatterHover.bind(this);
     this.handleConfigClick = this.handleConfigClick.bind(this);
+    this.handleSearchChange = this.handleSearchChange.bind(this);
   }
 
   /**
@@ -163,6 +166,10 @@ class App extends Component {
     const { configs } = this.state;
     configs[configId] = valueId;
     this.setState({ configs });
+  }
+
+  handleSearchChange(search) {
+    this.setState({ search });
   }
 
   /**
@@ -268,6 +275,11 @@ class App extends Component {
         yMetric={yMetric}
       />
     );
+  }
+
+  renderSearch() {
+    const { dataGrouped, search } = this.state;
+    return <Search onChange={this.handleSearchChange} data={dataGrouped} selected={search} />;
   }
 
   /**
@@ -471,8 +483,12 @@ class App extends Component {
             </Col>
           </Row>
           <Row>
-            <Col sm={6}>{this.renderConfigPanel('small')}</Col>
-            <Col sm={6}>{this.renderLegend()}</Col>
+            <Col sm={12}>{this.renderConfigPanel('small')}</Col>
+          </Row>
+          <Row>
+            <Col sm={5}>{this.renderSearch()}</Col>
+            <Col sm={3} />
+            <Col sm={4}>{this.renderLegend()}</Col>
           </Row>
           <Row>
             <Col sm={12}>{this.renderBigGraph()}</Col>

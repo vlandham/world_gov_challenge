@@ -45,7 +45,7 @@ class Search extends Component {
           multiple={true}
           minLength={2}
           onChange={this.handleChange}
-          placeholder="Filter countries..."
+          placeholder="Select countries by name..."
         />
       </div>
     );

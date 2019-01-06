@@ -352,10 +352,10 @@ class App extends Component {
               <p>What makes a “good” government?</p>
               <p>
                 When answering this question, it is easy to fall back on a commonly used measurement
-                like the <strong>Gross Domestic Product (GDP)</strong> that showcases a government’s
-                power and progress. The GDP measures the value of goods and services produced in a
-                period of time. It ranks countries, and their governments, by output, with more
-                output being associated with a “better” government.
+                such as the <strong>Gross Domestic Product (GDP)</strong> which showcases a
+                government’s power and progress. The GDP measures the value of goods and services
+                produced in a period of time. It ranks countries, and their governments, by output,
+                with more output being associated with a “better” government.
               </p>
 
               <p>
@@ -456,8 +456,8 @@ class App extends Component {
                 Display options allow us to find connections between countries and patterns within a
                 country, both at a <strong>global</strong> scale, and also at a{' '}
                 <strong>country-level</strong> scale for seeing year-to-year changes up close.
-                Individual country charts are <strong>annotated</strong> with explanations for the
-                patterns displayed.
+                Individual country charts are <strong>annotated</strong> with explanations for some
+                of the patterns displayed.
               </p>
               <p>
                 After exploring the visualization{' '}
@@ -472,7 +472,7 @@ class App extends Component {
               </p>
               <p>
                 With this visualization, we can see the progress of the governments of the world
-                toward or away from what is good for their peoples, as well as what is good for
+                towards or away from what is good for their peoples, as well as what is good for
                 economic growth.
               </p>
             </Col>

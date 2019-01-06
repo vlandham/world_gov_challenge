@@ -260,7 +260,10 @@ class SmallMultipleConnected extends Component {
           </Col>
           <Col sm={6}>{this.renderLegend()}</Col>
         </Row>
-        <Row>{dataGrouped.map((d, i) => [this.renderRegion(d, i), this.renderChart(d, i)])}</Row>
+        <Row>
+          <div className="blank-small" />
+          {dataGrouped.map((d, i) => [this.renderRegion(d, i), this.renderChart(d, i)])}
+        </Row>
         <MobileView>Explore all countries on a desktop browser.</MobileView>
       </div>
     );

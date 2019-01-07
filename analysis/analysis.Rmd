@@ -325,6 +325,26 @@ You'll note that i limited the year range to be between 2000 and 2018. This seem
 wb_data$year = as.numeric(wb_data$date)
 ```
 
+Unfortunately, the hdi and economic freedom historical data only have country names - and not ISO codes. A huge short-sightedness if you ask me. So we have to do some tweaking to get matches across these three datasets. I've tweaked the names in the staring CSV files for some countries, and below we augment the world data for some others. 
+
+
+```{r}
+wb_data$country <- recode(wb_data$country, 
+                              "Yemen, Rep." = "Yemen",
+                              "Lao PDR" = "Laos",
+                              "Korea, Dem. People’s Rep." = "North Korea",
+                              "Korea, Rep." = "South Korea",
+                              "Egypt, Arab Rep." = "Egypt",
+                              "Iran, Islamic Rep." = "Iran",
+                              "Slovak Republic" = "Slovakia",
+                              "Venezuela, RB" = "Venezuela",
+                              "Hong Kong SAR, China" = "Hong Kong",
+                              "Congo, Dem. Rep." = "Democratic Republic of Congo",
+                              "Congo, Rep." = "Republic of Congo"
+                              )
+```
+
+
 
 **Region Data**
 
@@ -353,7 +373,11 @@ ecfree_hdi_wb_data <- left_join(ecfree_hdi_data, wb_data, by = c("name" = "count
 ecfree_hdi_wb_data <- left_join(ecfree_hdi_wb_data, regions_data, by = c("iso3c" = "alpha-3"))
 ```
 
+
+
 So now this oddly named dataframe `ecfree_hdi_wb_data` includes columns from the above sources. 
+
+
 
 **Normalization**
 

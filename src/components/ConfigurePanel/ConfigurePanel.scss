@@ -3,5 +3,8 @@
   line-height: 3em;
   .dropdown {
     display: inline;
+    .selected {
+      background-color: #eee;
+    }
   }
 }

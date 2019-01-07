@@ -94,7 +94,11 @@ class ConfigurePanel extends Component {
     const dropdownState = this.state[dropdownId];
     const data = CONFIGS[dropdownId];
     const items = data.options.map((d, index) => (
-      <DropdownItem key={d.id} onClick={this.click.bind(this, dropdownId, d, index)}>
+      <DropdownItem
+        key={d.id}
+        className={dropdownState.selectIndex === index ? 'selected' : null}
+        onClick={this.click.bind(this, dropdownId, d, index)}
+      >
         {d.label}
       </DropdownItem>
     ));

@@ -225,4 +225,9 @@ export const ANNOTATIONS = {
   'Madagascar:hdi:gdp:local': [
     { year: 2015, text: 'Ousting of president starts economic crisis.', dx: -87, dy: 4 },
   ],
+  'United Arab Emirates:hdi:gdp:local': [
+    { year: 2008, text: 'Declining oil prices slow economic growth.', dx: -2, dy: 68 },
+  ],
+  'Venezuela:hdi:gdp:local': [{ year: 2003, text: 'Oil strike.', dx: 35, dy: -72 }],
+  'Liberia:hdi:gdp:local': [{ year: 2003, text: 'Second Liberian Civil War.', dx: 118, dy: -21 }],
 };

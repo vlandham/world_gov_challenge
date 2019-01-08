@@ -339,7 +339,7 @@ wb_data$country <- recode(wb_data$country,
                               "Slovak Republic" = "Slovakia",
                               "Venezuela, RB" = "Venezuela",
                               "Hong Kong SAR, China" = "Hong Kong",
-                              "Congo, Dem. Rep." = "Democratic Republic of Congo",
+                              "Congo, Dem. Rep." = "DR Congo",
                               "Congo, Rep." = "Republic of Congo"
                               )
 ```

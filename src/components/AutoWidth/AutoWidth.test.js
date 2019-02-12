@@ -1,5 +1,4 @@
 /**
- * @copyright 2018 Zymergen
  */
 import React from 'react';
 import ReactDOM from 'react-dom';
